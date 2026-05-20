@@ -62,7 +62,13 @@ export default function GuestApp({ onLogout }) {
           )}
         </AnimatePresence>
 
-        {overlay === "checkin" && <CheckInPage spotId={spotId} onBack={closeOverlay} />}
+        {overlay === "checkin" && (
+          <CheckInPage
+            spotId={spotId}
+            onBack={closeOverlay}
+            onSpotDetected={(id) => setSpotId(id)}
+          />
+        )}
         {overlay === "spot"    && <SpotDetail  spotId={spotId} onBack={closeOverlay} onCheckin={() => setOverlay("checkin")} />}
       </div>
 

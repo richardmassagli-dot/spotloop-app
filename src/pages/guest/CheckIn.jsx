@@ -6,6 +6,7 @@ import { getSpot, getOrCreateStamp, addStamp } from "../../lib/firestore";
 import { Screen, Btn, Card, ProgressBar, BackBtn, Tag, C, Spinner, StampGrid, CARD_GRADIENT } from "../../components/ui";
 import { ScanCooldownBadge, PrivacyNote } from "../../components/trust";
 import CheckInConsent, { hasConsented, markConsented } from "./CheckInConsent";
+import QRScanner from "../../components/QRScanner";
 import { demoSpots } from "../../lib/demoData";
 
 const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours
@@ -27,7 +28,7 @@ function fmtCooldown(ms) {
   return mins >= 60 ? `${Math.ceil(mins / 60)}h ${mins % 60}min` : `${mins} min`;
 }
 
-export default function CheckInPage({ spotId, onBack }) {
+export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
   const { user } = useAuth();
   const [spot, setSpot]     = useState(null);
   const [stamp, setStamp]   = useState(null);
@@ -94,30 +95,15 @@ export default function CheckInPage({ spotId, onBack }) {
     setSaving(false);
   };
 
-  // ── No spot ID ──
-  if (!spotId) return (
-    <div style={{ background: "#0A1A0F", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 }}>
-      <motion.div
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        style={{ fontSize: 56, marginBottom: 20 }}
-      >
-        📷
-      </motion.div>
-      <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 8, textAlign: "center" }}>QR-Code scannen</div>
-      <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", textAlign: "center", lineHeight: 1.6, marginBottom: 28 }}>
-        Halte die Kamera auf den QR-Code eines Spots, um Punkte zu sammeln.
-      </div>
-      <div style={{ display: "flex", gap: 10, flexDirection: "column", width: "100%", maxWidth: 280 }}>
-        {["Cafe Himmelblau","Gelato Amore","Bäckerei Morgenrot"].map((name, i) => (
-          <div key={name} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 18 }}>{["☕","🍦","🥐"][i]}</span>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)", fontWeight: 600 }}>{name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  // ── No spot ID: Kamera-QR-Scanner ──
+  if (!spotId) {
+    return (
+      <QRScanner
+        onDetected={(id) => onSpotDetected?.(id)}
+        onCancel={onBack}
+      />
+    );
+  }
 
   if (loading) return (
     <div style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
