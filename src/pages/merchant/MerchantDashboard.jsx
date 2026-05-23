@@ -172,7 +172,20 @@ export default function MerchantDashboard({ onLogout }) {
   }
 
   if (tab === "msettings") {
-    return <MerchantSettings onBack={goHub} onLogout={onLogout} spot={spot} embedded />;
+    return (
+      <div
+        style={{
+          background: MERCHANT_PAGE_BG,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          minHeight: 0,
+        }}
+      >
+        <MerchantSettings onBack={goHub} onLogout={onLogout} spot={spot} embedded />
+      </div>
+    );
   }
 
   const isHub = !tab || MERCHANT_CLASSIC;

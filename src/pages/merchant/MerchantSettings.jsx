@@ -243,7 +243,10 @@ export default function MerchantSettings({ onBack, onLogout, embedded = false, s
 
   const body = (
     <>
-      <div className={embedded ? "mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none" : "flex gap-2 overflow-x-auto px-4 py-3"}>
+      <div
+        className={embedded ? "flex gap-2.5 overflow-x-auto pb-2 scrollbar-none" : "flex gap-2 overflow-x-auto px-4 py-3"}
+        style={embedded ? { marginBottom: 20 } : undefined}
+      >
         {SECTIONS.map((s) => (
           <button
             key={s.id}
@@ -251,7 +254,7 @@ export default function MerchantSettings({ onBack, onLogout, embedded = false, s
             onClick={() => setActiveSection(s.id)}
             className={
               embedded
-                ? `min-h-[44px] shrink-0 rounded-2xl px-5 text-[14px] font-bold transition ${
+                ? `min-h-[44px] shrink-0 rounded-2xl px-5 py-2.5 text-[14px] font-bold transition ${
                     activeSection === s.id
                       ? "bg-[#0B1F3A] text-white shadow-sm"
                       : "border border-[#E8E8E4] bg-white text-[#64748b]"
@@ -358,13 +361,41 @@ export default function MerchantSettings({ onBack, onLogout, embedded = false, s
 
   if (embedded) {
     return (
-      <div className="min-w-0 pb-8">
-        <div className="mb-6">
-          <h2 className="text-[20px] font-bold tracking-tight text-[#0B1F3A]">Einstellungen</h2>
-          <p className="mt-2 text-[15px] leading-relaxed text-[#64748b]">
+      <div
+        className="scroll-y min-w-0"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          paddingTop: "max(20px, calc(env(safe-area-inset-top) + 16px))",
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 32,
+        }}
+      >
+        <header style={{ marginBottom: 28 }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 22,
+              fontWeight: 800,
+              letterSpacing: -0.4,
+              color: "#0B1F3A",
+              lineHeight: 1.2,
+            }}
+          >
+            Einstellungen
+          </h2>
+          <p
+            style={{
+              margin: "10px 0 0",
+              fontSize: 15,
+              lineHeight: 1.5,
+              color: "#64748b",
+            }}
+          >
             Betrieb, Team und Sicherheit — alles an einem Ort.
           </p>
-        </div>
+        </header>
         {body}
       </div>
     );
