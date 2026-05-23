@@ -42,7 +42,7 @@ body, #root {
   max-height: 100dvh;
   overflow: hidden;
   position: relative;
-  background: #EEF2EF;
+  background: #F7F9FF;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

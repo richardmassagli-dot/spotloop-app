@@ -8,6 +8,7 @@ import { useAuth } from './context/AuthContext.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
 import AdminSpots from './pages/admin/AdminSpots.jsx'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
+import BootComplete from './components/BootComplete.jsx'
 import { Spinner, C } from './components/ui.jsx'
 
 function ProtectedRoute({ children }) {
@@ -47,23 +48,18 @@ function showFatalError(err) {
     '</div>'
 }
 
-function signalAppReady() {
-  document.getElementById('spotloop-boot')?.remove()
-  window.dispatchEvent(new Event('spotloop-app-ready'))
-}
-
 const rootEl = document.getElementById('root')
 if (!rootEl) {
   showFatalError(new Error('#root fehlt in index.html'))
 } else {
   try {
     const root = createRoot(rootEl)
-    queueMicrotask(signalAppReady)
     root.render(
       <div
         className="app-frame"
         style={{ minHeight: '100dvh', background: '#F7F9FF', display: 'flex', flexDirection: 'column' }}
       >
+        <BootComplete />
         <AppErrorBoundary>
           <LocaleProvider>
             <AuthProvider>
@@ -79,7 +75,6 @@ if (!rootEl) {
         </AppErrorBoundary>
       </div>,
     )
-    requestAnimationFrame(signalAppReady)
   } catch (err) {
     showFatalError(err)
   }
