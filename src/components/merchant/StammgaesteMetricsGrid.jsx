@@ -18,6 +18,7 @@ export default function StammgaesteMetricsGrid({
   animate = false,
 }) {
   const isSheet = variant === "sheet";
+  const isHub = variant === "hub";
 
   const values = {
     returningRevenue: data.returningRevenue ?? 1248,
