@@ -8,7 +8,7 @@ import App from './App.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
 import AdminSpots from './pages/admin/AdminSpots.jsx'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
-import SpotloopWatermark from './components/SpotloopWatermark.jsx'
+import SpotloopWatermarkGate from './components/SpotloopWatermarkGate.jsx'
 import { Spinner, C } from './components/ui.jsx'
 
 function BootFallback() {
@@ -64,11 +64,11 @@ if (!rootEl) {
         className="app-frame"
         style={{ minHeight: '100dvh', background: '#F7F9FF', display: 'flex', flexDirection: 'column' }}
       >
-        <SpotloopWatermark />
         <AppErrorBoundary>
           <LocaleProvider>
             <AuthProvider>
               <BrowserRouter>
+                <SpotloopWatermarkGate />
                 <Routes>
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/admin/spots" element={<ProtectedRoute><AdminSpots /></ProtectedRoute>} />
