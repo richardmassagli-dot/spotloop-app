@@ -17,8 +17,36 @@ function last7DayCheckins(checkins = []) {
   return days;
 }
 
+/** Anteil der Monats-Check-ins von Gästen, die schon vor diesem Monat da waren. */
+function computeRepeatRate(checkins = []) {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstVisit = new Map();
+
+  for (const c of checkins) {
+    const uid = c.user_id;
+    if (!uid) continue;
+    const d = new Date(c.updated_at || c.created_at);
+    if (Number.isNaN(d.getTime())) continue;
+    if (!firstVisit.has(uid) || d < firstVisit.get(uid)) firstVisit.set(uid, d);
+  }
+
+  let total = 0;
+  let returning = 0;
+  for (const c of checkins) {
+    const uid = c.user_id;
+    if (!uid) continue;
+    const d = new Date(c.updated_at || c.created_at);
+    if (Number.isNaN(d.getTime()) || d < monthStart) continue;
+    total += 1;
+    if (firstVisit.get(uid) < monthStart) returning += 1;
+  }
+
+  return total > 0 ? Math.min(99, Math.round((returning / total) * 100)) : 0;
+}
+
 /**
- * Kennzahlen für Hub-Kachel & Detail-Sheet (echte Daten + sinnvolle Defaults).
+ * Kennzahlen für Hub-Kachel & Detail-Sheet — nur echte Daten, keine Demo-Zahlen.
  */
 export function buildMerchantInsights({
   checkins = [],
@@ -31,11 +59,11 @@ export function buildMerchantInsights({
   const dash = buildStammgaesteDashboard(stampMembers, spotId, { checkins, campaigns, followerCount });
   const returningRevenue = computeReturningRevenueThisMonth(checkins);
   const checkinsToday = computeCheckinsToday(checkins);
+  const repeatRate = computeRepeatRate(checkins);
 
-  const activeStamm =
-    dash.regular?.length ?? (dash.guests || []).filter((g) => !g.inactive).length ?? 0;
-  const sleepers = dash.inactive?.length ?? 0;
-  const atRisk = (dash.atRisk?.length ?? 0) + (dash.critical?.length ?? 0);
+  const activeStamm = dash.regular?.length ?? 0;
+  const sleepersAtRisk = (dash.atRisk?.length ?? 0) + (dash.critical?.length ?? 0);
+  const sleepersInactive = dash.inactive?.length ?? 0;
 
   const totalMonthVisits = (checkins || []).filter((c) => {
     const d = new Date(c.updated_at || c.created_at);
@@ -43,17 +71,16 @@ export function buildMerchantInsights({
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
-  const repeatRate =
-    totalMonthVisits > 0
-      ? Math.min(99, Math.round((returningRevenue / (totalMonthVisits * AVG_TICKET_EUR || 1)) * 100))
-      : 0;
+  const hasMonthData = totalMonthVisits > 0 || activeStamm > 0 || returningRevenue > 0;
 
-  const stammRevenue = dash.topRevenueEstimate || Math.round(activeStamm * AVG_TICKET_EUR * 1.4);
-  const totalEst = Math.max(stammRevenue + 200, returningRevenue + 180);
+  const stammRevenue = dash.topRevenueEstimate ?? 0;
+  const totalEst = Math.max(stammRevenue + returningRevenue, returningRevenue, 1);
   const stammPct = totalEst > 0 ? Math.round((stammRevenue / totalEst) * 100) : 0;
 
-  const sleeperPotential = sleepers * AVG_TICKET_EUR * 1.2;
-  const returnScore = Math.min(100, Math.max(0, Math.round(repeatRate * 1.75)));
+  const sleeperPotential = Math.round(sleepersInactive * AVG_TICKET_EUR * 1.2);
+  const returnScore = hasMonthData
+    ? Math.min(100, Math.max(0, Math.round(repeatRate * 0.7 + activeStamm * 8)))
+    : 0;
 
   const chart7 = last7DayCheckins(checkins);
   const maxBar = Math.max(1, ...chart7.map((d) => d.count));
@@ -62,38 +89,44 @@ export function buildMerchantInsights({
     .sort((a, b) => (b.revenueMonthEstimate ?? 0) - (a.revenueMonthEstimate ?? 0))
     .slice(0, 4);
 
+  const hub = {
+    returningRevenue,
+    repeatRate,
+    activeStammgaeste: activeStamm,
+    sleepers: sleepersAtRisk,
+    sleepersInactive,
+    returnScore,
+  };
+
   return {
     kpis: {
       checkinsToday,
       guests: followerCount,
       redemptions,
     },
-    hub: {
-      returningRevenue: returningRevenue || 1248,
-      repeatRate: repeatRate || 42,
-      activeStammgaeste: activeStamm || 12,
-      sleepers: sleepers || atRisk || 3,
-      returnScore: returnScore || 73,
-    },
+    hub,
     detail: {
-      returningRevenue: returningRevenue || 1248,
-      returningRevenueDelta: 18,
-      repeatRate: repeatRate || 42,
-      repeatRateDelta: 6,
-      activeStammgaeste: activeStamm || 12,
+      ...hub,
+      returningRevenueDelta: null,
+      repeatRateDelta: null,
       chart7,
       maxBar,
+      hasMonthData,
       segments: {
-        stamm: { revenue: stammRevenue || 820, pct: stammPct || 66 },
-        active: { revenue: Math.round((returningRevenue || 368) * 0.45) || 368 },
-        sleepers: { revenue: 0, potential: Math.round(sleeperPotential) || 180, count: sleepers || 3 },
-        newGuests: { revenue: 60 },
+        stamm: { revenue: stammRevenue, pct: stammPct },
+        active: { revenue: Math.max(0, returningRevenue - stammRevenue) },
+        sleepers: {
+          revenue: 0,
+          potential: sleeperPotential,
+          count: sleepersInactive,
+        },
+        newGuests: { revenue: Math.max(0, Math.round(totalMonthVisits * AVG_TICKET_EUR) - returningRevenue) },
       },
       topGuests,
       reactivation: {
-        count: sleepers || 3,
+        count: sleepersInactive,
         days: STAMMGAST_INACTIVE_DAYS,
-        potential: Math.round(sleeperPotential) || 180,
+        potential: sleeperPotential,
       },
     },
     dash,

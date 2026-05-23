@@ -6,7 +6,7 @@ import StammgaesteMetricsGrid, { StammgaesteScoreBar } from "./StammgaesteMetric
 /** Full-width Hub-Kachel — Stammgäste & Umsatz, übersichtlich gestapelt. */
 export default function MerchantStammgaesteHubCard({ insights, onClick, index = 4 }) {
   const h = insights?.hub ?? {};
-  const score = h.returnScore ?? 73;
+  const score = h.returnScore ?? 0;
 
   return (
     <motion.button
@@ -66,10 +66,10 @@ export default function MerchantStammgaesteHubCard({ insights, onClick, index = 
         <ChevronRight size={20} color={C.muted} style={{ flexShrink: 0 }} />
       </div>
 
-      <StammgaesteMetricsGrid data={h} variant="hub" />
+      <StammgaesteMetricsGrid data={h} variant="hub" animate={false} />
 
       <div style={{ marginTop: 14 }}>
-        <StammgaesteScoreBar score={score} animate />
+        <StammgaesteScoreBar score={score} animate={false} />
       </div>
     </motion.button>
   );

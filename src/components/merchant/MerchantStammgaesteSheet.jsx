@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { C } from "../ui";
 import { formatEuro } from "../../lib/merchantInsights";
-import CountUp from "./CountUp";
 import StammgaesteMetricsGrid, { StammgaesteScoreBar } from "./StammgaesteMetricsGrid";
 import { MERCHANT_PAGE_BG } from "./merchantHeader";
 
@@ -21,21 +20,6 @@ function useSheetPortal() {
   return root;
 }
 
-function EuroCountUp({ amount }) {
-  return (
-    <CountUp
-      value={amount}
-      format={(n) =>
-        new Intl.NumberFormat("de-DE", {
-          style: "currency",
-          currency: "EUR",
-          maximumFractionDigits: 0,
-        }).format(n)
-      }
-    />
-  );
-}
-
 export default function MerchantStammgaesteSheet({
   open,
   onClose,
@@ -45,7 +29,9 @@ export default function MerchantStammgaesteSheet({
 }) {
   const d = insights?.detail ?? {};
   const hub = insights?.hub ?? {};
-  const score = hub.returnScore ?? 73;
+  const chartTotal = (d.chart7 || []).reduce((s, day) => s + (day.count || 0), 0);
+  const score = hub.returnScore ?? 0;
+  const hasData = Boolean(d.hasMonthData ?? (chartTotal > 0 || (hub.activeStammgaeste ?? 0) > 0));
 
   useEffect(() => {
     if (!open) return undefined;
@@ -56,7 +42,6 @@ export default function MerchantStammgaesteSheet({
     };
   }, [open]);
 
-  const chartTotal = (d.chart7 || []).reduce((s, day) => s + (day.count || 0), 0);
   const portalRoot = useSheetPortal();
 
   if (!portalRoot) return null;
@@ -180,7 +165,7 @@ export default function MerchantStammgaesteSheet({
                   boxShadow: "0 2px 14px rgba(10, 22, 40, 0.06)",
                 }}
               >
-                <StammgaesteMetricsGrid data={hub} variant="sheet" animate />
+                <StammgaesteMetricsGrid data={hub} variant="sheet" animate={false} />
                 <div style={{ marginTop: 16 }}>
                   <StammgaesteScoreBar score={score} animate />
                 </div>
@@ -198,26 +183,19 @@ export default function MerchantStammgaesteSheet({
               >
                 <TrendKpi
                   label="Wiederkehr-Umsatz"
-                  value={<EuroCountUp amount={d.returningRevenue ?? 1248} />}
-                  delta={`+${d.returningRevenueDelta ?? 18} %`}
+                  value={formatEuro(hub.returningRevenue ?? 0)}
                 />
                 <TrendKpi
                   label="Wiederkehrquote"
-                  value={
-                    <>
-                      <CountUp value={d.repeatRate ?? 42} /> %
-                    </>
-                  }
-                  delta={`+${d.repeatRateDelta ?? 6} %`}
+                  value={`${hub.repeatRate ?? 0} %`}
                 />
                 <TrendKpi
                   label="Aktive Stammgäste"
-                  value={<CountUp value={d.activeStammgaeste ?? 12} />}
-                  span2={false}
+                  value={String(hub.activeStammgaeste ?? 0)}
                 />
                 <TrendKpi
                   label="Schläfer-Risiko"
-                  value={String(hub.sleepers ?? 3)}
+                  value={String(hub.sleepers ?? 0)}
                   warn={(hub.sleepers ?? 0) > 0}
                 />
               </div>
@@ -364,11 +342,17 @@ export default function MerchantStammgaesteSheet({
                   boxShadow: "0 2px 12px rgba(10, 22, 40, 0.05)",
                 }}
               >
-                {(d.topGuests?.length ? d.topGuests : demoGuests()).map((g, i, arr) => (
+                {(d.topGuests?.length ? d.topGuests : []).map((g, i, arr) => (
                   <GuestRow key={g.pseudonym || i} guest={g} isLast={i === arr.length - 1} />
                 ))}
+                {!d.topGuests?.length && (
+                  <div style={{ padding: "20px 16px", fontSize: 13, color: C.muted, textAlign: "center" }}>
+                    Noch keine ausreichenden Besuchsdaten — Check-ins sammeln, dann erscheinen Muster hier.
+                  </div>
+                )}
               </div>
 
+              {hasData && (d.reactivation?.count ?? 0) > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -381,9 +365,9 @@ export default function MerchantStammgaesteSheet({
                 }}
               >
                 <div style={{ fontSize: 14, fontWeight: 900, color: C.dark, lineHeight: 1.45 }}>
-                  {d.reactivation?.count ?? 3} Stammgäste waren {d.reactivation?.days ?? 21} Tage nicht da.
+                  {d.reactivation?.count ?? 0} Stammgäste waren {d.reactivation?.days ?? 21} Tage nicht da.
                   <br />
-                  Potenzial {formatEuro(d.reactivation?.potential ?? 180)}.
+                  Potenzial {formatEuro(d.reactivation?.potential ?? 0)}.
                 </div>
                 <button
                   type="button"
@@ -408,6 +392,22 @@ export default function MerchantStammgaesteSheet({
                   Reaktivierungs-Kampagne senden
                 </button>
               </motion.div>
+              )}
+
+              {!hasData && (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: C.muted,
+                    textAlign: "center",
+                    marginBottom: 16,
+                    lineHeight: 1.5,
+                    padding: "0 8px",
+                  }}
+                >
+                  Sobald Gäste einchecken, werden Umsatz und Wiederkehrquote aus echten Besuchen berechnet.
+                </p>
+              )}
 
               <p
                 style={{
@@ -566,11 +566,3 @@ function SegmentTile({ title, revenue, pct, potential, cta, onCta, delay, warn }
   );
 }
 
-function demoGuests() {
-  return [
-    { pseudonym: "Gast #A72X", patternHint: "Mo & Do · reagiert auf Push", revenueMonthLabel: "EUR 95", daysSinceVisit: 4 },
-    { pseudonym: "Gast #B19K", patternHint: "Wochenende", revenueMonthLabel: "EUR 72", daysSinceVisit: 22 },
-    { pseudonym: "Gast #C04M", patternHint: "Mittags", revenueMonthLabel: "EUR 58", daysSinceVisit: 8 },
-    { pseudonym: "Gast #D88P", patternHint: "Theke", revenueMonthLabel: "EUR 41", daysSinceVisit: 19 },
-  ];
-}

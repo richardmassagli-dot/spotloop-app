@@ -21,10 +21,10 @@ export default function StammgaesteMetricsGrid({
   const isHub = variant === "hub";
 
   const values = {
-    returningRevenue: data.returningRevenue ?? 1248,
-    repeatRate: data.repeatRate ?? 42,
-    activeStammgaeste: data.activeStammgaeste ?? 12,
-    sleepers: data.sleepers ?? 3,
+    returningRevenue: data.returningRevenue ?? 0,
+    repeatRate: data.repeatRate ?? 0,
+    activeStammgaeste: data.activeStammgaeste ?? 0,
+    sleepers: data.sleepers ?? 0,
   };
 
   return (
@@ -104,8 +104,8 @@ export default function StammgaesteMetricsGrid({
 }
 
 /** Wiederkehr-Score Balken */
-export function StammgaesteScoreBar({ score = 73, animate = false }) {
-  const s = Math.min(100, Math.max(0, score));
+export function StammgaesteScoreBar({ score = 0, animate = false }) {
+  const s = Math.min(100, Math.max(0, Number(score) || 0));
 
   return (
     <div style={{ width: "100%" }}>
@@ -140,7 +140,7 @@ export function StammgaesteScoreBar({ score = 73, animate = false }) {
             width: `${s}%`,
             borderRadius: 99,
             background: "linear-gradient(90deg, #1B4FD8, #059669)",
-            transition: animate ? "width 0.8s ease-out" : "none",
+            transition: "none",
           }}
         />
       </div>
