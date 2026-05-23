@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./context/AuthContext";
 import { getSpot } from "./lib/firestore";
 import Login from "./pages/auth/Login";
@@ -14,10 +14,19 @@ import { IS_LOCAL_MODE } from "./lib/config";
 
 const ONBOARDING_KEY = "myspot_onboarding_done";
 
+function signalAppReady() {
+  if (typeof window === "undefined") return;
+  window.__spotloopAppReady = true;
+  document.getElementById("spotloop-boot")?.remove();
+  window.dispatchEvent(new Event("spotloop-app-ready"));
+}
+
 function App() {
   const { user, profile, logout, loading } = useAuth();
   const [merchantSpot, setMerchantSpot] = useState(undefined);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [merchantLoadSlow, setMerchantLoadSlow] = useState(false);
+  const readySignaled = useRef(false);
 
   useEffect(() => {
     if (user && profile?.role !== "merchant") {
@@ -30,10 +39,23 @@ function App() {
   const isMerchant = profile?.role === "merchant";
 
   useEffect(() => {
+    if (!loading) {
+      if (!readySignaled.current) {
+        readySignaled.current = true;
+        signalAppReady();
+      }
+    }
+  }, [loading]);
+
+  useEffect(() => {
     if (!merchantUid || !isMerchant) {
       setMerchantSpot(undefined);
+      setMerchantLoadSlow(false);
       return undefined;
     }
+
+    setMerchantLoadSlow(false);
+    const slowHint = setTimeout(() => setMerchantLoadSlow(true), 5000);
 
     let cancelled = false;
     const timeout = setTimeout(() => {
@@ -54,6 +76,7 @@ function App() {
     return () => {
       cancelled = true;
       clearTimeout(timeout);
+      clearTimeout(slowHint);
     };
   }, [merchantUid, isMerchant]);
 
@@ -117,6 +140,29 @@ function App() {
           >
             <Spinner size={40} color={C.blue} />
             <span style={{ fontSize: 13, fontWeight: 600, color: C.muted }}>Dashboard wird geladen…</span>
+            {merchantLoadSlow && (
+              <div style={{ marginTop: 8, textAlign: "center", maxWidth: 280 }}>
+                <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.45, margin: "0 0 12px" }}>
+                  Verbindung dauert länger als üblich. Du kannst abmelden und es erneut versuchen.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: 10,
+                    border: `1px solid ${C.border}`,
+                    background: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.dark,
+                    cursor: "pointer",
+                  }}
+                >
+                  Abmelden
+                </button>
+              </div>
+            )}
           </div>
         </AppShell>
       );

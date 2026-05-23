@@ -29,10 +29,29 @@
         window.addEventListener("error", function (e) {
           if (document.getElementById("spotloop-boot") && e.message) showBootError(e.message);
         });
+        function isChunkLoadFailure(msg) {
+          if (!msg) return false;
+          return /dynamically imported module|Importing a module script failed|Loading chunk \d+ failed/i.test(
+            msg
+          );
+        }
+        function retryAfterChunkFailure() {
+          var key = "spotloop-chunk-retry-v1";
+          try {
+            if (!sessionStorage.getItem(key)) {
+              sessionStorage.setItem(key, "1");
+              location.reload();
+              return true;
+            }
+          } catch (err) {}
+          return false;
+        }
         window.addEventListener("unhandledrejection", function (e) {
-          if (!document.getElementById("spotloop-boot")) return;
           var r = e.reason;
-          showBootError((r && r.message) || String(r || "Unbekannter Fehler"));
+          var msg = (r && r.message) || String(r || "Unbekannter Fehler");
+          if (isChunkLoadFailure(msg) && retryAfterChunkFailure()) return;
+          if (!document.getElementById("spotloop-boot") && window.__spotloopAppReady) return;
+          showBootError(msg);
         });
         window.addEventListener("spotloop-app-ready", function () {
           var boot = document.getElementById("spotloop-boot");
@@ -44,7 +63,7 @@
           if (hint) hint.textContent = "Noch einen Moment — erste Ladung kann dauern…";
         }, 12000);
         setTimeout(function () {
-          if (window.__spotloopAppReady || !document.getElementById("spotloop-boot")) return;
+          if (window.__spotloopAppReady) return;
           showBootError(
             "Die App konnte nicht starten. Bitte Internet prüfen, Cache leeren (Safari: Website-Daten löschen) und neu laden."
           );

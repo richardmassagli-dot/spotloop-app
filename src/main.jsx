@@ -1,17 +1,14 @@
-import { lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { LocaleProvider } from './context/LocaleContext.jsx'
 import { useAuth } from './context/AuthContext.jsx'
+import App from './App.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
 import AdminSpots from './pages/admin/AdminSpots.jsx'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
-import BootComplete from './components/BootComplete.jsx'
 import { Spinner, C } from './components/ui.jsx'
-
-const App = lazy(() => import('./App.jsx'))
 
 function BootFallback() {
   return (
@@ -66,18 +63,15 @@ if (!rootEl) {
         className="app-frame"
         style={{ minHeight: '100dvh', background: '#F7F9FF', display: 'flex', flexDirection: 'column' }}
       >
-        <BootComplete />
         <AppErrorBoundary>
           <LocaleProvider>
             <AuthProvider>
               <BrowserRouter>
-                <Suspense fallback={<BootFallback />}>
-                  <Routes>
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/admin/spots" element={<ProtectedRoute><AdminSpots /></ProtectedRoute>} />
-                    <Route path="/*" element={<App />} />
-                  </Routes>
-                </Suspense>
+                <Routes>
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/admin/spots" element={<ProtectedRoute><AdminSpots /></ProtectedRoute>} />
+                  <Route path="/*" element={<App />} />
+                </Routes>
               </BrowserRouter>
             </AuthProvider>
           </LocaleProvider>

@@ -27,9 +27,19 @@ export default class AppErrorBoundary extends Component {
           <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.5, marginBottom: 16 }}>
             {this.state.error?.message || "Unbekannter Fehler"}
           </div>
+          <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.45, marginBottom: 12 }}>
+            Nach einem Update: Safari → Website-Daten für spotloop löschen, dann neu laden.
+          </p>
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              try {
+                sessionStorage.removeItem("spotloop-chunk-retry-v1");
+              } catch {
+                /* ignore */
+              }
+              window.location.reload();
+            }}
             style={{
               background: C.blue,
               color: "#fff",
