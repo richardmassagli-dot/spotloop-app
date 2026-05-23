@@ -29,7 +29,9 @@ Am Ende steht eine URL, z. B.:
 
 ### Live-URL (aktuell)
 
-**https://myspot-app-wheat.vercel.app**
+**https://spotloop-app-wheat.vercel.app** (blaue spotloop-App + Supabase)
+
+Alias-Backup: `https://myspot-app-wheat.vercel.app`
 
 ### 3. Supabase für die Live-URL einstellen
 

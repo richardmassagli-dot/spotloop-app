@@ -99,7 +99,7 @@ export default function RewardsMarket({ onSpotClick }) {
               {filter === "ready" ? "Noch kein Reward einlösbar" : "Keine aktiven Karten"}
             </div>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
-              Scanne QR-Codes um Punkte zu sammeln.
+              Scanne QR-Codes um Stempel zu sammeln.
             </div>
           </div>
         ) : (
@@ -187,7 +187,7 @@ function RewardCard({ stamp, onPress, onRedeem, redeeming }) {
           <div style={{ fontSize: 12, color: C.muted }}>
             {stamp.reward_ready
               ? <span style={{ color: C.orange, fontWeight: 700 }}>✨ {stamp.reward_text}</span>
-              : <span>{stamp.max_points - stamp.points} Punkte bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong></span>
+              : <span>{stamp.max_points - stamp.points} Stempel bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong></span>
             }
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: C.muted }}>{pct}%</div>

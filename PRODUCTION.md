@@ -88,7 +88,7 @@ Mittelfristig: Geocoding der Adresse beim Setup (Google/OSM API).
 | Hoch | Supabase Schema + RLS | ✅ `supabase/schema.sql` |
 | Hoch | Demo-Daten abschaltbar | ✅ nur im Local-Modus |
 | Hoch | Echte Auth (Email) | ✅ vorhanden |
-| Mittel | QR-Kamera-Scan | `html5-qrcode` installiert, noch nicht verdrahtet |
+| Mittel | QR-Kamera-Scan | ✅ Kamera-Scanner im Check-in (Scan-Tab); HTTPS nötig |
 | Mittel | Sichere QR-Tokens (Ablauf) | UI vorhanden, Server-Prüfung fehlt |
 | Mittel | Check-in Cooldown serverseitig | aktuell nur localStorage |
 | Mittel | Push-Benachrichtigungen | noch Demo in `NotificationCenter` |

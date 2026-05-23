@@ -4,6 +4,7 @@ import { getSpot } from "../../lib/firestore";
 import { VERIFICATION_STATUS } from "../../lib/merchantVerification";
 import { Screen, Btn, Logo, C, Card, Spinner } from "../../components/ui";
 import { PrivacyNote } from "../../components/trust";
+import DevBootstrapPanel from "../../components/DevBootstrapPanel";
 import { ShieldCheck, Clock, XCircle, RefreshCw } from "lucide-react";
 
 export default function MerchantVerificationPending({ spot: initialSpot, onRefresh, onLogout }) {
@@ -63,6 +64,19 @@ export default function MerchantVerificationPending({ spot: initialSpot, onRefre
         <PrivacyNote variant={isRejected ? "warning" : "info"}>
           <PrivacyContent />
         </PrivacyNote>
+
+        {!isRejected && (
+          <Card style={{ padding: 16, marginTop: 14, background: C.mintLight, border: `1px solid ${C.mint}` }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.dark, marginBottom: 8 }}>Nächste Schritte</div>
+            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: C.muted, lineHeight: 1.6 }}>
+              <li>E-Mail bestätigt und Spot-Profil vollständig ausgefüllt?</li>
+              <li>spotloop prüft deinen Betrieb (Status oben mit „Status aktualisieren“).</li>
+              <li>Bist du Admin? Profil → Datenschutz → <strong>Pending Spots prüfen</strong>, oder direkt <a href="/admin/spots" style={{ color: C.blue, fontWeight: 700 }}>/admin/spots</a>.</li>
+            </ol>
+          </Card>
+        )}
+
+        <DevBootstrapPanel onDone={() => refresh()} />
 
         <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
           {!isRejected && (

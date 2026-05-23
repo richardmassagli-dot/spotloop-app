@@ -8,6 +8,7 @@ import MerchantVerificationPending from "./pages/merchant/MerchantVerificationPe
 import { isMerchantVerified } from "./lib/merchantVerification";
 import GuestApp from "./pages/guest/GuestApp";
 import Onboarding from "./pages/Onboarding";
+import AppShell from "./components/AppShell";
 import { C, Spinner } from "./components/ui";
 import { IS_LOCAL_MODE } from "./lib/config";
 
@@ -25,22 +26,61 @@ function App() {
     }
   }, [user, profile]);
 
+  const merchantUid = user?.uid;
+  const isMerchant = profile?.role === "merchant";
+
   useEffect(() => {
-    if (user && profile?.role === "merchant") {
-      getSpot(user.uid).then(spot => setMerchantSpot(spot ?? null));
+    if (!merchantUid || !isMerchant) {
+      setMerchantSpot(undefined);
+      return undefined;
     }
-  }, [user, profile]);
+
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setMerchantSpot((prev) => (prev === undefined ? null : prev));
+      }
+    }, 10000);
+
+    getSpot(merchantUid)
+      .then((spot) => {
+        if (!cancelled) setMerchantSpot(spot ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setMerchantSpot(null);
+      })
+      .finally(() => clearTimeout(timeout));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [merchantUid, isMerchant]);
 
   const handleOnboardingDone = () => {
     localStorage.setItem(ONBOARDING_KEY, "1");
     setShowOnboarding(false);
   };
 
-  if (loading) return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", background: "#0F3D3E" }}>
-      <Spinner size={48} color="#fff" />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          minHeight: "100dvh",
+          gap: 16,
+          background: C.bg,
+        }}
+      >
+        <Spinner size={40} color={C.blue} />
+        <div style={{ fontSize: 14, fontWeight: 700, color: C.muted }}>Spotloop wird geladen…</div>
+      </div>
+    );
+  }
 
   const localBanner = IS_LOCAL_MODE ? (
     <div style={{
@@ -51,45 +91,74 @@ function App() {
     </div>
   ) : null;
 
-  if (!user) return (
-    <>
-      {localBanner}
-      <Login />
-    </>
-  );
+  if (!user) {
+    return (
+      <AppShell banner={localBanner}>
+        <Login />
+      </AppShell>
+    );
+  }
 
   if (profile?.role === "merchant") {
-    if (merchantSpot === undefined) return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-        <Spinner size={40} />
-      </div>
-    );
+    if (merchantSpot === undefined) {
+      return (
+        <AppShell banner={localBanner}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              flex: 1,
+              minHeight: "100dvh",
+              gap: 12,
+              background: C.bg,
+            }}
+          >
+            <Spinner size={40} color={C.blue} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: C.muted }}>Dashboard wird geladen…</span>
+          </div>
+        </AppShell>
+      );
+    }
     if (!merchantSpot) {
       return (
-        <>
-          {localBanner}
-          <MerchantSetup onDone={() => getSpot(user.uid).then(s => setMerchantSpot(s ?? null))} />
-        </>
+        <AppShell banner={localBanner}>
+          <MerchantSetup onDone={() => getSpot(user.uid).then((s) => setMerchantSpot(s ?? null))} />
+        </AppShell>
       );
     }
     if (!isMerchantVerified(merchantSpot)) {
       return (
-        <>
-          {localBanner}
+        <AppShell banner={localBanner}>
           <MerchantVerificationPending
             spot={merchantSpot}
             onRefresh={setMerchantSpot}
             onLogout={logout}
           />
-        </>
+        </AppShell>
       );
     }
-    return <>{localBanner}<MerchantDashboard onLogout={logout} /></>;
+    return (
+      <AppShell banner={localBanner}>
+        <MerchantDashboard onLogout={logout} />
+      </AppShell>
+    );
   }
 
-  if (showOnboarding) return <>{localBanner}<Onboarding onDone={handleOnboardingDone} /></>;
+  if (showOnboarding) {
+    return (
+      <AppShell banner={localBanner}>
+        <Onboarding onDone={handleOnboardingDone} />
+      </AppShell>
+    );
+  }
 
-  return <>{localBanner}<GuestApp onLogout={logout} /></>;
+  return (
+    <AppShell banner={localBanner}>
+      <GuestApp onLogout={logout} />
+    </AppShell>
+  );
 }
 
 export default App;

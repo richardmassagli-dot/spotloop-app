@@ -4,40 +4,67 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root {
+html {
   height: 100%;
+  height: -webkit-fill-available;
+}
+
+html, body, #root {
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   font-family: 'Inter', -apple-system, 'Helvetica Neue', sans-serif;
   background: #060E08;
+}
+
+body, #root {
+  height: 100%;
 }
 
 #root {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  min-height: 100%;
+  min-height: 100dvh;
 }
 
-/* Mobile phone wrapper on desktop */
+/* Mobile phone wrapper — immer .app-frame (main.jsx) */
+.app-frame,
+#root > .app-frame,
 #root > div {
   width: 100%;
   max-width: 390px;
   height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
   position: relative;
   background: #EEF2EF;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
 @media (min-width: 500px) {
+  .app-frame,
+  #root > .app-frame,
   #root > div {
     border-radius: 44px;
     box-shadow:
       0 0 0 1px rgba(255,255,255,.04),
       0 30px 80px rgba(0,0,0,.7),
       0 0 100px rgba(0,0,0,.4);
-    max-height: 852px;
+    max-height: min(852px, 100dvh);
+    min-height: min(600px, 100dvh);
+    height: min(852px, 100dvh);
+    align-self: center;
   }
 
   /* Notch simulation */
+  .app-frame::before,
   #root > div::before {
     content: '';
     position: absolute;
@@ -56,6 +83,54 @@ button { font-family: inherit; cursor: pointer; }
 input, textarea, select { font-family: inherit; }
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
+
+/* Scrollbare Bereiche innerhalb der fixen App-Hülle (#root overflow: hidden) */
+.scroll-y {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.app-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.app-shell-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Discover / Leaflet — Container braucht explizite Höhe */
+.discover-map-root {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.discover-map-root .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 280px;
+  z-index: 1;
+  background: #e8eef4;
+  font-family: inherit;
+}
+
+.discover-map-root .leaflet-tile-pane {
+  filter: saturate(1.02);
+}
 
 /* Smooth transitions globally */
 button { transition: opacity .15s, transform .12s; }

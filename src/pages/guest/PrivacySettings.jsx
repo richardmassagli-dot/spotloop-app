@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Shield, Bell, MapPin, Eye, Download, Trash2, Lock,
+  Shield, Bell, MapPin, Eye, Download, Trash2, Lock, Gift,
   ChevronRight, X, Check, AlertTriangle, Info, ShieldCheck,
   ToggleLeft, Users, MessageSquare, Zap,
 } from "lucide-react";
@@ -10,6 +10,9 @@ import { PermissionRow, PrivacyNote, MerchantTrustBanner, Toggle, TrustStrip } f
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { isAppAdminAccess } from "../../lib/admin";
+import DevBootstrapPanel from "../../components/DevBootstrapPanel";
+import { getSocialPrefs, setSocialPrefs } from "../../lib/social";
+import { getPrivacyPrefs, savePrivacyPrefs, syncPrivacyPrefsFromCloud, PAYMENT_PRINCIPLES } from "../../lib/privacy";
 
 const SECTION_STYLE = {
   background: "#fff",
@@ -25,24 +28,34 @@ const DIVIDER = { borderBottom: `1px solid ${C.border}` };
 export default function PrivacySettings({ onBack }) {
   const { user, profile, session } = useAuth();
   const [prefs, setPrefs] = useState({
-    push_rewards:      true,
-    push_campaigns:    false,
-    push_nearby:       true,
-    push_expiry:       true,
-    location_nearby:   false,
-    location_checkin:  true,
-    campaigns_all:     false,
-    campaigns_opted:   true,
-    discovery_personal:true,
-    personalized_offers: true,
-    loyalty_active:    true,
+    ...getPrivacyPrefs(),
+    ...getSocialPrefs(),
   });
+  useEffect(() => {
+    if (!user?.uid) return;
+    syncPrivacyPrefsFromCloud(user.uid).then((merged) => {
+      setPrefs((p) => ({ ...merged, ...getSocialPrefs() }));
+    });
+  }, [user?.uid]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showExportConfirm, setShowExportConfirm] = useState(false);
   const [deleteStep, setDeleteStep] = useState(0);
   const [exportDone, setExportDone] = useState(false);
 
-  const set = (key) => (val) => setPrefs(p => ({ ...p, [key]: val }));
+  const set = (key) => (val) => {
+    setPrefs((p) => {
+      const next = { ...p, [key]: val };
+      const socialKeys = ["show_activity", "show_visited_spots", "show_on_social_map", "group_rewards", "moments_visibility", "collections_default"];
+      if (socialKeys.includes(key)) {
+        setSocialPrefs({ [key]: val });
+      } else if (user?.uid) {
+        savePrivacyPrefs(user.uid, { [key]: val });
+      } else {
+        savePrivacyPrefs(null, { [key]: val });
+      }
+      return next;
+    });
+  };
 
   const handleExport = () => {
     const data = {
@@ -96,10 +109,10 @@ export default function PrivacySettings({ onBack }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
+              PAYMENT_PRINCIPLES.merchantVisibility,
+              "Keine universellen Punkte — nur Stempel pro Spot",
               "Spots können dich nur kontaktieren, wenn du zustimmst",
-              "Standort wird nur genutzt, wenn du es aktivierst",
               "Du kannst deine Daten jederzeit löschen oder exportieren",
-              "Keine Datenweitergabe an Dritte oder Wettbewerber",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                 <Check size={12} color="#7BDFAA" strokeWidth={3} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -114,7 +127,8 @@ export default function PrivacySettings({ onBack }) {
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<Bell size={18} />} label="Reward-Erinnerungen" sub="Wenn ein Reward einlösbar ist" value={prefs.push_rewards} onChange={set("push_rewards")} iconColor={C.fresh} /></div>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Kampagnen & Angebote" sub="Nur Spots, denen du folgst" value={prefs.push_campaigns} onChange={set("push_campaigns")} iconColor={C.gold} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Kampagnen & Angebote" sub="Nur Spots mit deiner Stempelkarte (nach Scan)" value={prefs.push_campaigns} onChange={set("push_campaigns")} iconColor={C.gold} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<MessageSquare size={18} />} label="Reaktivierungs-Einladungen" sub="Max. 1× pro Monat pro Spot — persönlich, kein Spam" value={prefs.push_reactivation !== false} onChange={(v) => set("push_reactivation")(v)} iconColor={C.blue} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<MapPin size={18} />} label="Lieblingsspot in der Nähe" sub="Wenn ein Favorit nahe ist" value={prefs.push_nearby} onChange={set("push_nearby")} iconColor={C.teal} /></div>
             <PermissionRow icon={<AlertTriangle size={18} />} label="Ablauf-Warnungen" sub="Bevor Punkte oder Rewards verfallen" value={prefs.push_expiry} onChange={set("push_expiry")} iconColor={C.orange} />
           </div>
@@ -137,17 +151,48 @@ export default function PrivacySettings({ onBack }) {
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<MessageSquare size={18} />} label="Kampagnen von allen Spots" sub="Deaktiviert für mehr Kontrolle empfohlen" value={prefs.campaigns_all} onChange={set("campaigns_all")} iconColor={C.orange} /></div>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Check size={18} />} label="Kampagnen von gefolgten Spots" sub="Nur Spots, denen du bewusst folgst" value={prefs.campaigns_opted} onChange={set("campaigns_opted")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Check size={18} />} label="Folgen ohne Stempel" sub="Interesse speichern — keine Kampagnen bis zum ersten Scan" value={prefs.campaigns_opted} onChange={set("campaigns_opted")} iconColor={C.fresh} /></div>
             <PermissionRow icon={<Users size={18} />} label="Personalisierte Empfehlungen" sub="Relevante Spots basierend auf deiner Aktivität" value={prefs.discovery_personal} onChange={set("discovery_personal")} iconColor={C.purple || "#8B5CF6"} />
           </div>
         </div>
 
-        {/* Loyalty */}
-        <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 8, paddingLeft: 4 }}>TREUEPROGRAMM</div>
+        {/* Social */}
+        <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 8, paddingLeft: 4 }}>SPOTLOOP SOCIAL</div>
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Loyalitäts-Teilnahme" sub="Punkte sammeln & Rewards einlösen" value={prefs.loyalty_active} onChange={set("loyalty_active")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Users size={18} />} label="Freundes-Aktivität" sub="Dezente Hinweise wie „Anna war bei …“" value={prefs.show_activity} onChange={set("show_activity")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<MapPin size={18} />} label="Besuchte Spots für Freunde" sub="Freunde sehen, wo du warst (wenn du willst)" value={prefs.show_visited_spots} onChange={set("show_visited_spots")} iconColor={C.teal} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Eye size={18} />} label="Auf Social Map erscheinen" sub="Freundeskreis sieht deine Spots auf der Karte" value={prefs.show_on_social_map} onChange={set("show_on_social_map")} iconColor={C.blue} /></div>
+            <PermissionRow icon={<Gift size={18} />} label="Gemeinsame Rewards" sub="Gruppenbonus & „Freund mitbringen“" value={prefs.group_rewards} onChange={set("group_rewards")} iconColor={C.gold} />
+          </div>
+          <div style={{ padding: "0 16px 12px" }}>
+            <PrivacyNote>Collections sind standardmäßig privat. Food Moments nur für Freunde — kein öffentlicher Feed.</PrivacyNote>
+          </div>
+        </div>
+
+        {/* Loyalty & Spot-Sichtbarkeit */}
+        <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 8, paddingLeft: 4 }}>TREUE & SPOT-SICHTBARKEIT</div>
+        <div style={SECTION_STYLE}>
+          <div style={{ padding: "0 16px" }}>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Loyalitäts-Teilnahme" sub="Stempel pro Spot — keine app-weiten Punkte" value={prefs.loyalty_active} onChange={set("loyalty_active")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Eye size={18} />} label="Smart Member Profile" sub="Spots sehen Besuche, Stufe & Rewards — als Pseudonym" value={prefs.share_loyalty_insights} onChange={set("share_loyalty_insights")} iconColor={C.blue} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Lock size={18} />} label="Ausgaben für Spots teilen" sub="Ø Besuchswert in Insights (keine Zahlungsdaten)" value={prefs.share_spend_with_spots} onChange={set("share_spend_with_spots")} iconColor={C.orange} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Gift size={18} />} label="Personalisierte Kampagnen" sub="Geburtstag & Reaktivierung nur mit Zustimmung" value={prefs.allow_personalized_campaigns} onChange={set("allow_personalized_campaigns")} iconColor={C.gold} /></div>
             <PermissionRow icon={<Eye size={18} />} label="Personalisierte Angebote" sub="Rewards basierend auf deinen Besuchen" value={prefs.personalized_offers} onChange={set("personalized_offers")} iconColor={C.teal} />
+          </div>
+          <div style={{ padding: "0 16px 12px" }}>
+            <PrivacyNote>Spots sehen dich als z. B. Member #A72X91 — nie deinen echten Namen aus der Wallet.</PrivacyNote>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 8, paddingLeft: 4 }}>COMMUNITY</div>
+        <div style={SECTION_STYLE}>
+          <div style={{ padding: "0 16px" }}>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Users size={18} />} label="Community-Einladungen" sub="Spots dürfen dich in Clubs einladen" value={prefs.allow_community_invites} onChange={set("allow_community_invites")} iconColor={C.blue} /></div>
+            <PermissionRow icon={<Eye size={18} />} label="In Community sichtbar" sub="Pseudonym in der Member-Liste deines Spots" value={prefs.community_visible_to_spot} onChange={set("community_visible_to_spot")} iconColor={C.teal} />
+          </div>
+          <div style={{ padding: "0 16px 12px" }}>
+            <PrivacyNote>Du entscheidest selbst über Beitritt — keine automatische Aufnahme.</PrivacyNote>
           </div>
         </div>
 
@@ -198,6 +243,13 @@ export default function PrivacySettings({ onBack }) {
               </div>
               <ChevronRight size={16} color={C.muted} />
             </button>
+          </div>
+        </div>
+
+        <div style={SECTION_STYLE}>
+          <div style={{ padding: "14px 16px" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.dark, marginBottom: 4 }}>Entwickler / Test</div>
+            <DevBootstrapPanel compact onDone={() => window.location.reload()} />
           </div>
         </div>
 

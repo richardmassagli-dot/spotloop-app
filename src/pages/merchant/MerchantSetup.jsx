@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { createSpot } from "../../lib/firestore";
+import { createSpot, formatDbError } from "../../lib/firestore";
 import { Screen, Btn, Input, Logo, C, Card, Alert } from "../../components/ui";
+import { MERCHANT_ONBOARDING_CORE } from "../../data/spotloopMessaging";
 
 const CATEGORIES = ["☕ Café", "🍹 Bar", "🍕 Restaurant", "🥐 Bäckerei", "🍔 Imbiss", "🍵 Teehaus"];
 const REWARDS    = ["Gratis Kaffee", "Gratis Drink", "Gratis Dessert", "10% Rabatt", "Gratis Brezel", "Gratis Snack"];
@@ -26,27 +27,31 @@ export default function MerchantSetup({ onDone }) {
     setLoading(true);
     setError("");
     try {
+      const catParts = cat.trim().split(/\s+/);
+      const spotEmoji = catParts[0] || "☕";
+      const categoryName = catParts.slice(1).join(" ") || cat.replace(spotEmoji, "").trim() || cat;
+
       await createSpot(user.uid, {
         name:        spotName,
-        category:    cat,
+        category:    categoryName,
         area,
         address,
         description: desc,
         reward_text: reward,
         max_points:  parseInt(pts),
-        emoji:       cat.split(" ")[0],
+        emoji:       spotEmoji,
         bg_color:    bgColor,
         isActive:    true,
       });
       onDone();
     } catch (e) {
-      setError(e?.message || "Spot konnte nicht gespeichert werden.");
+      setError(formatDbError(e) || "Spot konnte nicht gespeichert werden.");
     } finally {
       setLoading(false);
     }
   };
 
-  const steps = ["Profil", "Reward", "Fertig!"];
+  const steps = ["Start", "Profil", "Reward", "Fertig!"];
 
   return (
     <Screen bg={C.bg} pad={false}>
@@ -67,8 +72,37 @@ export default function MerchantSetup({ onDone }) {
 
       <div style={{ padding: "24px 24px" }}>
         {error && <Alert type="error">{error}</Alert>}
-        {/* Step 0 – Profil */}
+
         {step === 0 && (
+          <>
+            <div
+              style={{
+                textAlign: "center",
+                padding: "28px 8px 32px",
+                marginBottom: 8,
+              }}
+            >
+              <div style={{ fontSize: 40, marginBottom: 16 }}>📡</div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  color: C.dark,
+                  lineHeight: 1.35,
+                  letterSpacing: -0.4,
+                  maxWidth: 300,
+                  margin: "0 auto",
+                }}
+              >
+                {MERCHANT_ONBOARDING_CORE}
+              </div>
+            </div>
+            <Btn onClick={() => setStep(1)}>Weiter →</Btn>
+          </>
+        )}
+
+        {/* Step 1 – Profil */}
+        {step === 1 && (
           <>
             <div style={{ fontSize: 22, fontWeight: 800, color: C.dark, marginBottom: 6 }}>Profil anlegen</div>
             <div style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>Wie ist dein Spot?</div>
@@ -116,12 +150,12 @@ export default function MerchantSetup({ onDone }) {
                 style={{ width: "100%", background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 10, padding: "12px 14px", fontSize: 13, color: C.dark, outline: "none", resize: "none", fontFamily: "inherit" }}
               />
             </div>
-            <Btn onClick={() => cat && setStep(1)} disabled={!cat}>Weiter →</Btn>
+            <Btn onClick={() => cat && setStep(2)} disabled={!cat}>Weiter →</Btn>
           </>
         )}
 
-        {/* Step 1 – Reward */}
-        {step === 1 && (
+        {/* Step 2 – Reward */}
+        {step === 2 && (
           <>
             <div style={{ fontSize: 22, fontWeight: 800, color: C.dark, marginBottom: 6 }}>Reward festlegen</div>
             <div style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>Was bekommen treue Gäste?</div>
@@ -143,7 +177,7 @@ export default function MerchantSetup({ onDone }) {
               </div>
             ))}
 
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.mid, marginTop: 16, marginBottom: 8 }}>Punkte bis zum Reward</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.mid, marginTop: 16, marginBottom: 8 }}>Stempel bis zum Reward</div>
             <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
               {["5", "8", "10", "12"].map(p => (
                 <button
@@ -160,14 +194,14 @@ export default function MerchantSetup({ onDone }) {
               ))}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <Btn variant="ghost" onClick={() => setStep(0)} style={{ flex: 1 }}>← Zurück</Btn>
-              <Btn onClick={() => reward && setStep(2)} disabled={!reward} style={{ flex: 2 }}>Weiter →</Btn>
+              <Btn variant="ghost" onClick={() => setStep(1)} style={{ flex: 1 }}>← Zurück</Btn>
+              <Btn onClick={() => reward && setStep(3)} disabled={!reward} style={{ flex: 2 }}>Weiter →</Btn>
             </div>
           </>
         )}
 
-        {/* Step 2 – Done */}
-        {step === 2 && (
+        {/* Step 3 – Done */}
+        {step === 3 && (
           <>
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 56, marginBottom: 12 }}>🎉</div>
@@ -192,7 +226,7 @@ export default function MerchantSetup({ onDone }) {
               ))}
             </Card>
             <div style={{ display: "flex", gap: 8 }}>
-              <Btn variant="ghost" onClick={() => setStep(1)} style={{ flex: 1 }}>← Zurück</Btn>
+              <Btn variant="ghost" onClick={() => setStep(2)} style={{ flex: 1 }}>← Zurück</Btn>
               <Btn onClick={finish} disabled={loading} style={{ flex: 2 }}>
                 {loading ? "Wird erstellt…" : "Zur Verifizierung einreichen →"}
               </Btn>

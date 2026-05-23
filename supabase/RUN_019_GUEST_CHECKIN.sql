@@ -1,0 +1,3 @@
+-- Einmalig im Supabase SQL Editor ausführen (behebt „Punkt sichern“ für Gäste):
+-- https://supabase.com/dashboard/project/jhyxufqmcwxhvwwkqhnt/sql/new
+-- Inhalt = supabase/migrations/019_guest_checkin.sql

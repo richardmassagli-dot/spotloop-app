@@ -24,7 +24,7 @@ const PERMISSIONS = [
     id: "loyalty",
     Icon: Star,
     label: "Stempelkarte & Rewards",
-    desc: "Punkte sammeln und Rewards einlösen",
+    desc: "Stempel sammeln und Rewards einlösen",
     color: C.fresh,
     required: true,
   },
@@ -39,8 +39,8 @@ const PERMISSIONS = [
   {
     id: "location",
     Icon: MapPin,
-    label: "Standort-Empfehlungen",
-    desc: "Benachrichtigung, wenn du in der Nähe bist",
+    label: "In der Nähe erinnert werden",
+    desc: "Nur ~200 m vom Spot — z. B. „Noch 3 Stempel bis Gratis-Kaffee“",
     color: "#1B6CA8",
     required: false,
   },
@@ -102,8 +102,9 @@ export default function CheckInConsent({ spot, onAccept, onDecline }) {
             <div style={{ fontSize: 13, fontWeight: 800, color: C.dark, marginBottom: 4 }}>
               Dieser Spot möchte folgendes:
             </div>
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>
-              Wähle, was du zulässt. Du kannst alles später ändern.
+            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.45 }}>
+              Kein Pflicht-Standort — nur ein Vorteil: Wir erinnern dich, wenn du wirklich in der Nähe bist.
+              Du kannst alles später in den Einstellungen ändern.
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -149,7 +150,7 @@ export default function CheckInConsent({ spot, onAccept, onDecline }) {
             {/* Privacy note */}
             <div style={{ marginTop: 12 }}>
               <PrivacyNote variant="success">
-                Der Spot sieht nie deine persönlichen Daten. Nur deine Stempelkarte ist für den Betrieb sichtbar.
+                Der Spot sieht dich als anonymes Loyalty-Profil (z. B. Member #A72X91) — kein Name, keine Zahlungsdaten. Stempel gelten nur bei diesem Spot.
               </PrivacyNote>
             </div>
 

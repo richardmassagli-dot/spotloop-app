@@ -5,7 +5,7 @@ import { C, CARD_GRADIENT, Spinner } from "../../components/ui";
 import { GuestTrustFooter, TrustChip } from "../../components/trust";
 import PrivacySettings from "./PrivacySettings";
 import SupportCenter from "./SupportCenter";
-import { ShieldCheck } from "lucide-react";
+import { getRedeemedCount } from "../../lib/guestStats";
 
 export default function Profile({ onLogout }) {
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -31,15 +31,14 @@ export default function Profile({ onLogout }) {
       });
   }, [user.uid]);
 
-  const totalPoints  = stamps.reduce((a, s) => a + s.points, 0);
   const totalVisits  = stamps.reduce((a, s) => a + s.points, 0);
+  const redeemedCount = getRedeemedCount(user.uid);
   const readyRewards = stamps.filter(s => s.reward_ready).length;
   const memberSince  = new Date(user.created_at || Date.now()).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
 
   const SETTINGS = [
     { icon: "🔔", label: "Benachrichtigungen", sub: "Push & E-Mail", action: null },
     { icon: "🔒", label: "Datenschutz & Sicherheit", sub: "Daten, Kontrolle, DSGVO", action: () => setShowPrivacy(true), highlight: true },
-    { icon: "💳", label: "Zahlungsmethoden", sub: "Karte hinzufügen", action: null },
     { icon: "🎁", label: "Einladungen", sub: "Freunde werben", action: null },
     { icon: "❓", label: "Hilfe & Support", sub: "FAQ, Tickets, Kontakt", action: () => setShowSupport(true) },
     { icon: "⚙️", label: "Einstellungen", sub: "App-Einstellungen", action: null },
@@ -75,9 +74,8 @@ export default function Profile({ onLogout }) {
         {/* Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, position: "relative" }}>
           {[
-            { val: totalVisits,       label: "Besuche",   icon: "⬛" },
-            { val: stamps.length,     label: "Karten",    icon: "💳" },
-            { val: readyRewards,      label: "Rewards",   icon: "🎁" },
+            { val: totalVisits,       label: "Besuche",   icon: "👣" },
+            { val: redeemedCount,     label: "Rewards",   icon: "🎁" },
           ].map((s, i) => (
             <div key={i} style={{ background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 8px", textAlign: "center" }}>
               <div style={{ fontSize: 20, marginBottom: 2 }}>{s.icon}</div>
@@ -124,8 +122,8 @@ export default function Profile({ onLogout }) {
           </div>
           <div style={{ display: "flex", gap: 12 }}>
             {[
-              { label: "Gesammelte Punkte", val: totalPoints },
-              { label: "Stempelkarten",     val: stamps.length },
+              { label: "Rewards eingelöst", val: redeemedCount },
+              { label: "Stempelkarten", val: stamps.length },
             ].map((r, i) => (
               <div key={i} style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px" }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: C.dark, letterSpacing: -0.5 }}>{r.val}</div>

@@ -10,6 +10,8 @@ import { useAuth } from "../../context/AuthContext";
 import { getAllSpots, getUserStamps } from "../../lib/firestore";
 import { C, CARD_GRADIENT, Spinner } from "../../components/ui";
 import { mergeSpots } from "../../lib/demoData";
+import { spotOpenLabel } from "../../lib/spotHours";
+import { formatDistanceKm } from "../../lib/nearbySpots";
 
 // Fix Leaflet default marker icon paths broken by bundlers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -23,19 +25,17 @@ const STUTTGART_CENTER = [48.7758, 9.1829];
 const MAP_ZOOM = 14;
 
 const CATS = [
-  { id: "alle",       label: "Alle",        emoji: "✨" },
-  { id: "Café",       label: "Cafés",       emoji: "☕" },
-  { id: "Restaurant", label: "Restaurants", emoji: "🍽️" },
-  { id: "Bäckerei",   label: "Bäckereien",  emoji: "🥐" },
-  { id: "Eisdiele",   label: "Eis",         emoji: "🍦" },
-  { id: "Bar",        label: "Bars",        emoji: "🍸" },
+  { id: "alle", label: "Alle", emoji: "✨" },
+  { id: "Café", label: "Café", emoji: "☕" },
+  { id: "Restaurant", label: "Restaurant", emoji: "🍽️" },
+  { id: "Bar", label: "Bar", emoji: "🍸" },
 ];
 
 const DISCOVERY_CHIPS = [
-  { id: "trending", label: "Trending", icon: "🔥",  filter: s => s.trending },
-  { id: "rewards",  label: "Rewards",  icon: "🎁",  filter: s => s.reward_text },
-  { id: "open",     label: "Jetzt offen", icon: "🟢", filter: () => true },
-  { id: "new",      label: "Neu dabei", icon: "⭐",  filter: (s, stamps) => !stamps.find(st => st.spot_id === s.id) },
+  { id: "favorites", label: "Lieblingsorte", icon: "❤️", filter: (s, stamps) => stamps.some((st) => st.spot_id === s.id) },
+  { id: "recommended", label: "Empfehlungen", icon: "⭐", filter: (s) => s.verified !== false },
+  { id: "rewards", label: "Mit Reward", icon: "🎁", filter: (s) => s.reward_text },
+  { id: "new", label: "Schöne Spots", icon: "✨", filter: (s, stamps) => !stamps.find((st) => st.spot_id === s.id) },
 ];
 
 function createMarker(spot, isSelected, hasStamp, rewardReady) {
@@ -86,7 +86,25 @@ function MapFlyTo({ center, zoom }) {
   const map = useMap();
   useEffect(() => {
     map.flyTo(center, zoom, { duration: 0.8 });
-  }, [center, zoom]);
+  }, [center, zoom, map]);
+  return null;
+}
+
+/** Leaflet rendert sonst oft mit Höhe 0 bis invalidateSize. */
+function MapInvalidateSize() {
+  const map = useMap();
+  useEffect(() => {
+    const run = () => map.invalidateSize({ animate: false });
+    run();
+    const t1 = setTimeout(run, 80);
+    const t2 = setTimeout(run, 400);
+    window.addEventListener("resize", run);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener("resize", run);
+    };
+  }, [map]);
   return null;
 }
 
@@ -220,22 +238,24 @@ export default function Discover({ onSpotClick }) {
 
       {/* ── Map View ── */}
       {view === "map" && (
-        <div style={{ position: "relative", flex: 1 }}>
+        <div className="discover-map-root" style={{ position: "relative", flex: 1, minHeight: 0 }}>
           {loading ? (
-            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: C.bg }}>
+            <div style={{ height: "100%", minHeight: 320, display: "flex", alignItems: "center", justifyContent: "center", background: C.bg }}>
               <Spinner size={40} />
             </div>
           ) : (
             <MapContainer
               center={STUTTGART_CENTER}
               zoom={MAP_ZOOM}
-              style={{ height: "100%", width: "100%", zIndex: 1 }}
+              style={{ height: "100%", width: "100%", minHeight: 320 }}
               zoomControl={false}
               attributionControl={false}
             >
+              <MapInvalidateSize />
               <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                 attribution="© OpenStreetMap © CARTO"
+                maxZoom={20}
               />
               {flyTo && <MapFlyTo center={flyTo} zoom={15} />}
               {filtered.map(spot => {
@@ -298,10 +318,29 @@ export default function Discover({ onSpotClick }) {
             <Navigation size={18} color={C.green} />
           </motion.button>
 
-          {/* Spot count */}
-          {filtered.length > 0 && (
-            <div style={{ position: "absolute", top: 148, right: 14, zIndex: 10, background: "rgba(255,255,255,.88)", backdropFilter: "blur(8px)", borderRadius: 99, padding: "4px 10px", boxShadow: "0 2px 10px rgba(0,0,0,.1)" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: C.dark }}>{filtered.length} Spots</span>
+          {/* Spot count / empty hint */}
+          {!loading && (
+            <div
+              style={{
+                position: "absolute",
+                top: 148,
+                right: 14,
+                zIndex: 10,
+                background: "rgba(255,255,255,.92)",
+                backdropFilter: "blur(8px)",
+                borderRadius: 12,
+                padding: filtered.length > 0 ? "4px 10px" : "8px 12px",
+                boxShadow: "0 2px 10px rgba(0,0,0,.1)",
+                maxWidth: 160,
+              }}
+            >
+              {filtered.length > 0 ? (
+                <span style={{ fontSize: 11, fontWeight: 700, color: C.dark }}>{filtered.length} Spots</span>
+              ) : (
+                <span style={{ fontSize: 11, fontWeight: 700, color: C.muted, lineHeight: 1.4 }}>
+                  Keine Spots — Filter anpassen oder Liste öffnen
+                </span>
+              )}
             </div>
           )}
 
@@ -335,6 +374,14 @@ export default function Discover({ onSpotClick }) {
             <div style={{ display: "flex", justifyContent: "center", padding: 60 }}><Spinner size={40} /></div>
           ) : (
             <div style={{ padding: "0 14px" }}>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: C.dark, letterSpacing: -0.4 }}>
+                  Lieblingsorte & schöne Spots
+                </div>
+                <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.5, fontWeight: 500 }}>
+                  Empfehlungen in deiner Nähe — echte Orte, keine Werbelärm.
+                </div>
+              </div>
               {/* Discovery chips */}
               <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 14, scrollbarWidth: "none" }}>
                 {DISCOVERY_CHIPS.map(chip => (
@@ -458,7 +505,7 @@ function MapPreviewCard({ spot, stamp, onOpen, onClose }) {
           <div style={{ background: `${bg}08`, border: `1px solid ${bg}20`, borderRadius: 12, padding: "10px 12px", marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: bg }}>
-                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Punkte`}
+                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Stempel`}
               </span>
               <span style={{ fontSize: 11, color: C.muted }}>
                 {stamp.reward_ready ? stamp.reward_text : `Noch ${stamp.max_points - stamp.points} bis: ${stamp.reward_text}`}
@@ -545,6 +592,7 @@ function SpotListRow({ spot, stamp, onPress }) {
   const bg = spot.bg_color || C.green;
   const rewardReady = stamp?.reward_ready;
   const pct = stamp ? Math.round((stamp.points / stamp.max_points) * 100) : 0;
+  const openLabel = spotOpenLabel(spot);
 
   return (
     <motion.div
@@ -572,7 +620,12 @@ function SpotListRow({ spot, stamp, onPress }) {
         </div>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 7 }}>
           {spot.category}{spot.area && ` · ${spot.area}`}
-          {spot.distance && ` · ${spot.distance}`}
+          {spot._distanceKm != null && ` · ${formatDistanceKm(spot._distanceKm)}`}
+          {openLabel && (
+            <span style={{ marginLeft: 6, fontWeight: 700, color: openLabel === "Geöffnet" ? C.green : C.muted }}>
+              · {openLabel}
+            </span>
+          )}
         </div>
         {stamp ? (
           <div>

@@ -197,6 +197,106 @@ export const localCheckins = {
   },
 };
 
+// ── SPOT MESSAGES (Gast ↔ Merchant) ─────────────────────────────
+export const localSpotMessages = {
+  _all() {
+    return get("local_spot_messages", []);
+  },
+
+  sendGuest(spotId, guestUserId, body) {
+    const list = this._all();
+    const id = uid();
+    const row = {
+      id,
+      spot_id: spotId,
+      guest_user_id: guestUserId,
+      thread_id: id,
+      sender: "guest",
+      body: body.trim(),
+      merchant_read: false,
+      guest_read: true,
+      created_at: now(),
+    };
+    list.unshift(row);
+    set("local_spot_messages", list);
+    return row;
+  },
+
+  replyGuestInThread(spotId, guestUserId, threadId, body) {
+    const list = this._all();
+    const row = {
+      id: uid(),
+      spot_id: spotId,
+      guest_user_id: guestUserId,
+      thread_id: threadId,
+      sender: "guest",
+      body: body.trim(),
+      merchant_read: false,
+      guest_read: true,
+      created_at: now(),
+    };
+    list.unshift(row);
+    set("local_spot_messages", list);
+    return row;
+  },
+
+  replyMerchant(spotId, guestUserId, threadId, body) {
+    const list = this._all();
+    const row = {
+      id: uid(),
+      spot_id: spotId,
+      guest_user_id: guestUserId,
+      thread_id: threadId,
+      sender: "merchant",
+      body: body.trim(),
+      merchant_read: true,
+      guest_read: false,
+      created_at: now(),
+    };
+    list.unshift(row);
+    set("local_spot_messages", list);
+    return row;
+  },
+
+  forSpot(spotId) {
+    return this._all().filter((m) => m.spot_id === spotId);
+  },
+
+  forGuest(userId) {
+    return this._all().filter((m) => m.guest_user_id === userId);
+  },
+
+  threadMessages(threadId) {
+    return this._all()
+      .filter((m) => m.thread_id === threadId)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  },
+
+  markMerchantRead(spotId, threadId) {
+    const list = this._all();
+    let changed = false;
+    for (const m of list) {
+      if (m.spot_id === spotId && m.thread_id === threadId && m.sender === "guest" && !m.merchant_read) {
+        m.merchant_read = true;
+        changed = true;
+      }
+    }
+    if (changed) set("local_spot_messages", list);
+  },
+
+  markGuestRead(userId, threadId) {
+    const list = this._all();
+    let changed = false;
+    for (const m of list) {
+      if (m.guest_user_id === userId && m.thread_id === threadId && m.sender === "merchant" && !m.guest_read) {
+        m.guest_read = true;
+        changed = true;
+      }
+    }
+    if (changed) set("local_spot_messages", list);
+  },
+};
+
 // ── CAMPAIGNS ────────────────────────────────────────────────────
 export const localCampaigns = {
   create(spotId, data) {

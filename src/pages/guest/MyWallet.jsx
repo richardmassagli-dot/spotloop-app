@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { getUserStamps, redeemStamp } from "../../lib/firestore";
-import { C, PremiumCard, StampGrid, ProgressBar, Spinner, CARD_GRADIENT } from "../../components/ui";
+import { C, PremiumCard, Spinner, CARD_GRADIENT } from "../../components/ui";
+import StampCard from "../../components/stamp/StampCard";
 
 export default function MyWallet({ onSpotClick, onLogout }) {
   const { user, profile } = useAuth();
@@ -111,86 +112,19 @@ export default function MyWallet({ onSpotClick, onLogout }) {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {stamps.map(stamp => (
+            {stamps.map((stamp) => (
               <StampCard
                 key={stamp.id}
                 stamp={stamp}
+                spot={stamp.spot}
+                variant="full"
                 onPress={() => onSpotClick(stamp.spot_id)}
                 onRedeem={(e) => handleRedeem(stamp, e)}
                 redeeming={redeeming === stamp.spot_id}
+                showCta
               />
             ))}
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StampCard({ stamp, onPress, onRedeem, redeeming }) {
-  const spot = stamp.spot;
-  const bg   = spot?.bg_color || C.green;
-
-  return (
-    <div
-      onClick={onPress}
-      style={{
-        background: C.white, borderRadius: 18,
-        border: `1.5px solid ${stamp.reward_ready ? C.orange : C.border}`,
-        boxShadow: stamp.reward_ready ? `0 6px 20px ${C.orange}1A` : `0 2px 12px ${C.shadow}`,
-        overflow: "hidden", cursor: "pointer",
-      }}
-    >
-      {/* Colored header strip */}
-      <div style={{ height: 56, background: `linear-gradient(90deg, ${bg}18, ${bg}08)`, display: "flex", alignItems: "center", padding: "0 16px", gap: 12 }}>
-        <div style={{ fontSize: 26, width: 40, height: 40, borderRadius: 12, background: `${bg}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {spot?.emoji || "🏪"}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{spot?.name || stamp.spot_id}</div>
-          <div style={{ fontSize: 11, color: C.muted }}>{spot?.category}{spot?.area && ` · ${spot.area}`}</div>
-        </div>
-        <div>
-          {stamp.reward_ready
-            ? <div style={{ background: C.orange, color: "#fff", borderRadius: 99, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>🎁</div>
-            : <div style={{ fontSize: 16, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>
-                {stamp.points}<span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>/{stamp.max_points}</span>
-              </div>
-          }
-        </div>
-      </div>
-
-      <div style={{ padding: "12px 16px 14px" }}>
-        <StampGrid pts={stamp.points} max={stamp.max_points} color={stamp.reward_ready ? C.orange : bg} />
-
-        <div style={{ marginTop: 10 }}>
-          <ProgressBar value={stamp.points} max={stamp.max_points} color={stamp.reward_ready ? C.orange : bg} height={5} bg={stamp.reward_ready ? "#FFF2EE" : `${bg}15`} />
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-          <div style={{ fontSize: 12, color: C.muted }}>
-            {stamp.reward_ready
-              ? <span style={{ color: C.orange, fontWeight: 700 }}>✨ {stamp.reward_text} bereit!</span>
-              : <span>{stamp.max_points - stamp.points} Punkte bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong></span>
-            }
-          </div>
-        </div>
-
-        {stamp.reward_ready && (
-          <button
-            onClick={onRedeem}
-            disabled={redeeming}
-            style={{
-              width: "100%", marginTop: 12,
-              background: C.orange, color: "#fff",
-              border: "none", borderRadius: 12, padding: "11px",
-              fontSize: 13, fontWeight: 700, cursor: redeeming ? "not-allowed" : "pointer",
-              opacity: redeeming ? 0.7 : 1,
-              boxShadow: `0 4px 14px ${C.orange}40`,
-            }}
-          >
-            {redeeming ? "Wird eingelöst…" : "🎁 Reward einlösen"}
-          </button>
         )}
       </div>
     </div>

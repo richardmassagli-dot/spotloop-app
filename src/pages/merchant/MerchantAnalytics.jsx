@@ -8,12 +8,21 @@ import {
 import {
   TrendingUp, TrendingDown, Users, Star, Zap, Euro, Target,
   Gift, BarChart2, Calendar, ChevronRight, ChevronDown,
-  ArrowUpRight, ArrowDownRight, Plus, Play, Pause, X,
-  Award, Clock, RefreshCw, UserCheck, UserX, Flame, Sparkles,
+  ArrowUpRight, ArrowDownRight,
+  Award, Clock, RefreshCw, UserCheck, UserX, Flame,
 } from "lucide-react";
 import { MERCHANT_DEMO } from "../../data/demo";
+import {
+  HeaderShell,
+  HeaderBackButton,
+  HeaderEyebrow,
+  HeaderTitle,
+  HeaderSubtitle,
+  HeaderKpiGrid,
+  HeaderSegmentPills,
+} from "../../components/merchant/merchantHeader";
 
-const { kpis, weekly_visits, monthly_revenue, guest_segments, top_rewards, campaigns, insights, hourly_heatmap } = MERCHANT_DEMO;
+const { kpis, weekly_visits, monthly_revenue, guest_segments, top_rewards, insights, hourly_heatmap } = MERCHANT_DEMO;
 
 const C = {
   bg: "#F7F9FF",
@@ -37,9 +46,15 @@ const C = {
   shadowMd: "rgba(10,22,40,.10)",
 };
 
-const TABS = ["Übersicht", "Gäste", "Kampagnen", "Einblicke"];
+const TABS = ["Übersicht", "Gäste", "Einblicke"];
 
 const GRADIENT = "linear-gradient(145deg, #0A1628 0%, #1B4FD8 55%, #0EA5E9 100%)";
+
+const DATE_RANGE_OPTIONS = [
+  { id: "7d", label: "7 Tage" },
+  { id: "30d", label: "30 Tage" },
+  { id: "90d", label: "90 Tage" },
+];
 
 function fmt(v, unit = "") {
   if (unit === "€") return `${v.toLocaleString("de")} €`;
@@ -268,6 +283,9 @@ function GuestsTab() {
 
   return (
     <div>
+      <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, marginBottom: 16, padding: "10px 12px", background: C.mintLight, borderRadius: 12, border: `1px solid ${C.border}` }}>
+        🔒 Privacy-first: Analytics nur aggregiert — keine Namen, keine Zahlungsdaten einzelner Members.
+      </div>
       <SectionTitle>Gästesegmente</SectionTitle>
       <div style={{ background: C.white, borderRadius: 18, padding: "16px", border: `1px solid ${C.border}`, boxShadow: `0 2px 12px ${C.shadow}`, marginBottom: 24 }}>
         <ResponsiveContainer width="100%" height={180}>
@@ -369,263 +387,6 @@ function GuestsTab() {
   );
 }
 
-// ── CAMPAIGNS TAB ─────────────────────────────────────────────────────────────
-const CAMPAIGN_TYPES = [
-  { id: "bonus_points", icon: "⚡", label: "Bonuspunkte", desc: "Doppelte Punkte in einem Zeitraum", color: C.gold },
-  { id: "win_back", icon: "💌", label: "Win-Back", desc: "Inaktive Gäste zurückgewinnen", color: C.orange },
-  { id: "discount", icon: "🏷️", label: "Rabatt", desc: "Prozentualer Nachlass für Segmente", color: C.purple },
-  { id: "happy_hour", icon: "🕐", label: "Happy Hour", desc: "Sonderaktionen zu bestimmten Zeiten", color: C.teal },
-  { id: "loyalty_bonus", icon: "👑", label: "Treuebonus", desc: "Extra-Rewards für Stammgäste", color: C.fresh },
-];
-
-const TARGET_OPTIONS = [
-  { id: "all", label: "Alle Gäste", count: 312 },
-  { id: "inactive_30d", label: "Inaktiv 30 Tage", count: 45 },
-  { id: "inactive_60d", label: "Inaktiv 60 Tage", count: 28 },
-  { id: "stammgaeste", label: "Stammgäste", count: 142 },
-  { id: "new", label: "Neue Gäste", count: 89 },
-];
-
-function CampaignsTab() {
-  const [showCreate, setShowCreate] = useState(false);
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ type: null, title: "", target: "all", reward: "", estimate: null });
-
-  const selectedType = CAMPAIGN_TYPES.find(t => t.id === form.type);
-  const selectedTarget = TARGET_OPTIONS.find(t => t.id === form.target);
-  const estimatedReach = selectedTarget?.count || 0;
-  const estimatedVisits = Math.round(estimatedReach * 0.38);
-  const estimatedRevenue = estimatedVisits * 7.2;
-
-  const statusColor = (s) => ({ active: C.fresh, completed: C.teal, draft: C.muted }[s] || C.muted);
-  const statusLabel = (s) => ({ active: "Aktiv", completed: "Abgeschlossen", draft: "Entwurf" }[s] || s);
-
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: C.dark }}>Kampagnen</div>
-        <button
-          onClick={() => { setShowCreate(true); setStep(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 6, background: GRADIENT, color: "#fff", border: "none", borderRadius: 12, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-        >
-          <Plus size={14} /> Neue Kampagne
-        </button>
-      </div>
-
-      {/* Active campaigns */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-        {campaigns.map(c => (
-          <motion.div
-            key={c.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ background: C.white, borderRadius: 18, border: `1.5px solid ${c.status === "active" ? `${C.fresh}40` : C.border}`, boxShadow: `0 2px 12px ${C.shadow}`, overflow: "hidden" }}
-          >
-            <div style={{ padding: "14px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                <div style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: C.dark, marginBottom: 2 }}>{c.title}</div>
-                  <div style={{ fontSize: 11, color: C.muted }}>
-                    {c.start} – {c.end} · {TARGET_OPTIONS.find(t => t.id === c.target)?.label}
-                  </div>
-                </div>
-                <div style={{ background: `${statusColor(c.status)}15`, color: statusColor(c.status), borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 800, flexShrink: 0 }}>
-                  {statusLabel(c.status)}
-                </div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                <div style={{ background: C.bg, borderRadius: 10, padding: "8px 10px" }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: C.dark }}>{c.reach}</div>
-                  <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Erreicht</div>
-                </div>
-                <div style={{ background: C.bg, borderRadius: 10, padding: "8px 10px" }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: C.fresh }}>{c.visits_generated}</div>
-                  <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Besuche</div>
-                </div>
-                <div style={{ background: C.bg, borderRadius: 10, padding: "8px 10px" }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: C.green }}>{c.revenue} €</div>
-                  <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Umsatz</div>
-                </div>
-              </div>
-              {c.roi && (
-                <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, background: C.mintLight, borderRadius: 10, padding: "8px 12px" }}>
-                  <TrendingUp size={14} color={C.fresh} />
-                  <span style={{ fontSize: 12, fontWeight: 700, color: C.green }}>ROI: {c.roi}% · Nettogewinn: {c.revenue - c.cost} €</span>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Campaign creation modal */}
-      <AnimatePresence>
-        {showCreate && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 1000, display: "flex", alignItems: "flex-end", justifyContent: "center" }}
-            onClick={(e) => e.target === e.currentTarget && setShowCreate(false)}
-          >
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 400 }}
-              style={{ background: C.white, borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 390, maxHeight: "85vh", overflowY: "auto", padding: "8px 0 0" }}
-            >
-              {/* Handle */}
-              <div style={{ width: 40, height: 4, background: C.border, borderRadius: 2, margin: "0 auto 16px" }} />
-              <div style={{ padding: "0 20px 32px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: C.dark }}>
-                    {step === 0 ? "Kampagnentyp" : step === 1 ? "Einstellungen" : "Vorschau & Start"}
-                  </div>
-                  <button onClick={() => setShowCreate(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.muted }}>
-                    <X size={20} />
-                  </button>
-                </div>
-
-                {/* Step indicator */}
-                <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
-                  {[0,1,2].map(i => (
-                    <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? GRADIENT : C.border, transition: "background .3s" }} />
-                  ))}
-                </div>
-
-                {step === 0 && (
-                  <div>
-                    <div style={{ fontSize: 13, color: C.muted, marginBottom: 14 }}>Welche Art von Kampagne möchtest du starten?</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {CAMPAIGN_TYPES.map(t => (
-                        <button
-                          key={t.id}
-                          onClick={() => { setForm(f => ({ ...f, type: t.id })); setStep(1); }}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 14,
-                            background: form.type === t.id ? `${t.color}10` : C.bg,
-                            border: `1.5px solid ${form.type === t.id ? t.color : C.border}`,
-                            borderRadius: 14, padding: "14px", cursor: "pointer", textAlign: "left",
-                          }}
-                        >
-                          <div style={{ fontSize: 24, width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            {t.icon}
-                          </div>
-                          <div>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.dark }}>{t.label}</div>
-                            <div style={{ fontSize: 11, color: C.muted }}>{t.desc}</div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {step === 1 && (
-                  <div>
-                    <div style={{ marginBottom: 14 }}>
-                      <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: "block", marginBottom: 6 }}>KAMPAGNENTITEL</label>
-                      <input
-                        value={form.title}
-                        onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                        placeholder={selectedType ? `z.B. "${selectedType.label} – ${MERCHANT_DEMO.spot.name}"` : "Kampagnentitel"}
-                        style={{ width: "100%", background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "12px 14px", fontSize: 14, color: C.dark, outline: "none", fontFamily: "inherit" }}
-                      />
-                    </div>
-                    <div style={{ marginBottom: 14 }}>
-                      <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: "block", marginBottom: 6 }}>REWARD / ANGEBOT</label>
-                      <input
-                        value={form.reward}
-                        onChange={e => setForm(f => ({ ...f, reward: e.target.value }))}
-                        placeholder='z.B. "Gratis Espresso" oder "Doppelte Punkte"'
-                        style={{ width: "100%", background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "12px 14px", fontSize: 14, color: C.dark, outline: "none", fontFamily: "inherit" }}
-                      />
-                    </div>
-                    <div style={{ marginBottom: 20 }}>
-                      <label style={{ fontSize: 12, fontWeight: 700, color: C.muted, display: "block", marginBottom: 8 }}>ZIELGRUPPE</label>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        {TARGET_OPTIONS.map(t => (
-                          <button
-                            key={t.id}
-                            onClick={() => setForm(f => ({ ...f, target: t.id }))}
-                            style={{
-                              display: "flex", justifyContent: "space-between", alignItems: "center",
-                              background: form.target === t.id ? C.mintLight : C.bg,
-                              border: `1.5px solid ${form.target === t.id ? C.fresh : C.border}`,
-                              borderRadius: 12, padding: "10px 14px", cursor: "pointer",
-                            }}
-                          >
-                            <span style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>{t.label}</span>
-                            <span style={{ fontSize: 12, fontWeight: 800, color: form.target === t.id ? C.fresh : C.muted }}>{t.count} Gäste</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setStep(2)}
-                      disabled={!form.title || !form.reward}
-                      style={{ width: "100%", background: form.title && form.reward ? GRADIENT : C.border, color: "#fff", border: "none", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 700, cursor: form.title && form.reward ? "pointer" : "not-allowed" }}
-                    >
-                      Weiter →
-                    </button>
-                  </div>
-                )}
-
-                {step === 2 && (
-                  <div>
-                    <div style={{ background: C.bg, borderRadius: 16, padding: "16px", marginBottom: 16 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                        <div style={{ fontSize: 28 }}>{selectedType?.icon}</div>
-                        <div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: C.dark }}>{form.title || "Neue Kampagne"}</div>
-                          <div style={{ fontSize: 11, color: C.muted }}>{selectedType?.label} · {selectedTarget?.label}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                        <div style={{ background: C.white, borderRadius: 10, padding: "10px", textAlign: "center" }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: C.teal }}>{estimatedReach}</div>
-                          <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Erreichbar</div>
-                        </div>
-                        <div style={{ background: C.white, borderRadius: 10, padding: "10px", textAlign: "center" }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: C.fresh }}>~{estimatedVisits}</div>
-                          <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Est. Besuche</div>
-                        </div>
-                        <div style={{ background: C.white, borderRadius: 10, padding: "10px", textAlign: "center" }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: C.green }}>~{Math.round(estimatedRevenue)} €</div>
-                          <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>Est. Umsatz</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ background: C.mintLight, borderRadius: 12, padding: "12px 14px", marginBottom: 20, display: "flex", gap: 10 }}>
-                      <Sparkles size={16} color={C.fresh} style={{ flexShrink: 0, marginTop: 2 }} />
-                      <span style={{ fontSize: 12, color: C.green, fontWeight: 600, lineHeight: 1.5 }}>
-                        Ähnliche Kampagnen erzielen bei {MERCHANT_DEMO.spot.name} durchschnittlich {Math.round(estimatedVisits * 0.7)} Besuche in den ersten 7 Tagen.
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => setShowCreate(false)}
-                      style={{ width: "100%", background: GRADIENT, color: "#fff", border: "none", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
-                    >
-                      <Play size={16} /> Kampagne starten
-                    </button>
-                    <button
-                      onClick={() => setStep(1)}
-                      style={{ width: "100%", background: "none", border: "none", color: C.muted, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 10, padding: 8 }}
-                    >
-                      ← Zurück
-                    </button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 // ── INSIGHTS TAB ──────────────────────────────────────────────────────────────
 function InsightsTab() {
   const typeStyle = {
@@ -719,67 +480,62 @@ export default function MerchantAnalytics({ onBack }) {
   const [dateRange, setDateRange] = useState("7d");
 
   return (
-    <div style={{ background: C.bg, minHeight: "100%", display: "flex", flexDirection: "column" }}>
-      {/* Header */}
-      <div style={{ background: GRADIENT, padding: "52px 20px 0", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -80, right: -40, width: 240, height: 240, borderRadius: "50%", background: "rgba(255,255,255,.03)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -60, left: -30, width: 200, height: 200, borderRadius: "50%", background: "rgba(19,176,92,.06)", pointerEvents: "none" }} />
-
-        {/* Back + title */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, position: "relative" }}>
-          {onBack && (
-            <button onClick={onBack} style={{ background: "rgba(255,255,255,.1)", border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
-              ‹
-            </button>
-          )}
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>Analytics</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>{MERCHANT_DEMO.spot.name}</div>
-          </div>
-          {/* Date range selector */}
-          <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
-            {["7d","30d","90d"].map(r => (
-              <button
-                key={r}
-                onClick={() => setDateRange(r)}
-                style={{
-                  background: dateRange === r ? "rgba(255,255,255,.15)" : "transparent",
-                  border: `1px solid ${dateRange === r ? "rgba(255,255,255,.3)" : "rgba(255,255,255,.1)"}`,
-                  color: dateRange === r ? "#fff" : "rgba(255,255,255,.5)",
-                  borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer",
-                }}
-              >
-                {r}
-              </button>
-            ))}
+    <div style={{ background: C.bg, height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <HeaderShell paddingBottom={0} style={{ paddingTop: "max(48px, calc(env(safe-area-inset-top) + 12px))" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+          {onBack && <HeaderBackButton onClick={onBack} />}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <HeaderEyebrow>Intelligence</HeaderEyebrow>
+            <HeaderTitle size={24}>Analytics</HeaderTitle>
+            <HeaderSubtitle>{MERCHANT_DEMO.spot.name}</HeaderSubtitle>
           </div>
         </div>
 
-        {/* Quick KPI strip */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16, position: "relative" }}>
-          {[
-            { val: `${kpis.revenue_from_myspot.value.toLocaleString("de")} €`, label: "spotloop Umsatz", change: `+${kpis.revenue_from_myspot.change_pct}%` },
-            { val: kpis.repeat_customers.value, label: "Stammgäste", change: `+${kpis.repeat_customers.change_pct}%` },
-            { val: `${kpis.repeat_visit_rate.value}%`, label: "Wiederkehrquote", change: `+${kpis.repeat_visit_rate.change}%p` },
-          ].map((s, i) => (
-            <div key={i} style={{ background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: -0.5 }}>{s.val}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,.45)", fontWeight: 700 }}>{s.label}</div>
-              <div style={{ fontSize: 9, color: "#7BDFAA", fontWeight: 700, marginTop: 2 }}>{s.change}</div>
-            </div>
-          ))}
+        <div style={{ marginBottom: 14 }}>
+          <HeaderSegmentPills options={DATE_RANGE_OPTIONS} value={dateRange} onChange={setDateRange} />
         </div>
 
-        {/* Tab bar */}
-        <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,.08)", position: "relative" }}>
+        <HeaderKpiGrid
+          items={[
+            {
+              val: `${kpis.revenue_from_myspot.value.toLocaleString("de")} €`,
+              label: "Umsatz",
+              change: `+${kpis.revenue_from_myspot.change_pct}%`,
+            },
+            {
+              val: kpis.repeat_customers.value,
+              label: "Stammgäste",
+              change: `+${kpis.repeat_customers.change_pct}%`,
+            },
+            {
+              val: `${kpis.repeat_visit_rate.value}%`,
+              label: "Wiederkehr",
+              change: `+${kpis.repeat_visit_rate.change}pp`,
+            },
+          ]}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            marginTop: 16,
+            padding: "4px 4px 0",
+            borderTop: "1px solid rgba(255,255,255,.1)",
+          }}
+        >
           {TABS.map((tab, i) => (
             <button
               key={tab}
+              type="button"
               onClick={() => setActiveTab(i)}
               style={{
-                flex: 1, background: "none", border: "none", cursor: "pointer",
-                padding: "10px 4px 12px",
-                fontSize: 12, fontWeight: activeTab === i ? 800 : 500,
+                flex: 1,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "12px 6px 14px",
+                fontSize: 12,
+                fontWeight: activeTab === i ? 800 : 500,
                 color: activeTab === i ? "#fff" : "rgba(255,255,255,.4)",
                 position: "relative",
               }}
@@ -787,17 +543,25 @@ export default function MerchantAnalytics({ onBack }) {
               {tab}
               {activeTab === i && (
                 <motion.div
-                  layoutId="tab-indicator"
-                  style={{ position: "absolute", bottom: 0, left: "10%", width: "80%", height: 2, background: C.fresh, borderRadius: 1 }}
+                  layoutId="analytics-tab-indicator"
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: "12%",
+                    width: "76%",
+                    height: 3,
+                    background: "linear-gradient(90deg, #7DD3FC, #fff)",
+                    borderRadius: 3,
+                  }}
                 />
               )}
             </button>
           ))}
         </div>
-      </div>
+      </HeaderShell>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 92px" }}>
+      <div className="scroll-y" style={{ flex: 1, minHeight: 0, padding: "20px 20px 92px" }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -808,8 +572,7 @@ export default function MerchantAnalytics({ onBack }) {
           >
             {activeTab === 0 && <OverviewTab />}
             {activeTab === 1 && <GuestsTab />}
-            {activeTab === 2 && <CampaignsTab />}
-            {activeTab === 3 && <InsightsTab />}
+            {activeTab === 2 && <InsightsTab />}
           </motion.div>
         </AnimatePresence>
       </div>

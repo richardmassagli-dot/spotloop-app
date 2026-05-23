@@ -21,7 +21,8 @@ npm run build
 echo "🚀 Deploy zu Vercel (Production)…"
 npx vercel@latest deploy --prod \
   --env "VITE_SUPABASE_URL=${VITE_SUPABASE_URL}" \
-  --env "VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}"
+  --env "VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}" \
+  --env "VITE_ENABLE_DEV_BOOTSTRAP=${VITE_ENABLE_DEV_BOOTSTRAP:-false}"
 
 echo ""
 echo "✅ Nach dem Deploy in Supabase eintragen:"

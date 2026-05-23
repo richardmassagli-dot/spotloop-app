@@ -3,10 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   TrendingUp, Euro, Users, Gift, Shield, Settings,
-  AlertTriangle, Check, ChevronRight, Plus, Minus, Info,
+  AlertTriangle, Check, ChevronRight, Plus, Minus, Info, LogOut,
 } from "lucide-react";
 import { C, CARD_GRADIENT } from "../../components/ui";
+import {
+  HeaderShell,
+  HeaderBackButton,
+  HeaderEyebrow,
+  HeaderTitle,
+  HeaderSubtitle,
+} from "../../components/merchant/merchantHeader";
 import { MerchantTrustBanner, PrivacyNote, Toggle } from "../../components/trust";
+import SpotloopPricing from "../../components/merchant/SpotloopPricing";
 import { useAuth } from "../../context/AuthContext";
 import { isAppAdminAccess } from "../../lib/admin";
 import { MERCHANT_DEMO } from "../../data/demo";
@@ -16,20 +24,16 @@ const { kpis } = MERCHANT_DEMO;
 // ── Monthly Value Summary ─────────────────────────────────────────────────────
 export function MonthlyValueSummary() {
   const items = [
-    { icon: "🔄", label: "Aktivierte Wiederbesuche", value: "143", sub: "durch spotloop-Kampagnen", color: C.fresh },
-    { icon: "💶", label: "Kampagnen-Umsatz", value: "720 €", sub: "Mai 2025", color: C.green },
-    { icon: "👥", label: "Inaktive Gäste reaktiviert", value: "18", sub: "durch Win-Back", color: C.teal },
-    { icon: "📈", label: "Retention verbessert", value: "+4.2%p", sub: "vs. Vormonat", color: "#8B5CF6" },
-    { icon: "🎁", label: "Eingelöste Rewards", value: "67", sub: "Conversion: 24%", color: C.gold },
-    { icon: "💡", label: "Geschätzter Net-ROI", value: "~300%", sub: "Kampagnenrendite", color: C.orange },
+    { icon: "🔄", label: "Wiederkehrende Gäste", value: "—", sub: "nach Scan, Reward oder Kampagne", color: C.fresh },
+    { icon: "🎁", label: "Reward-Rückkehr", value: "—", sub: "Gäste mit eingelöstem Reward", color: C.orange },
+    { icon: "📣", label: "Kampagnen-Rückkehr", value: "—", sub: "nach Push-Nachricht", color: C.blue },
   ];
 
   return (
     <div style={{ background: C.white, borderRadius: 18, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: `0 2px 10px rgba(6,13,8,.06)`, marginBottom: 16 }}>
-      {/* Header */}
       <div style={{ background: CARD_GRADIENT, padding: "14px 16px" }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", letterSpacing: 2, fontWeight: 700, marginBottom: 3 }}>MAI 2025 · MONATSBERICHT</div>
-        <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>spotloop hat diesen Monat generiert:</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", letterSpacing: 2, fontWeight: 700, marginBottom: 3 }}>WIEDERKEHR</div>
+        <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Sichtbare Kundenbindung</div>
       </div>
       <div style={{ padding: "0 16px" }}>
         {items.map((item, i) => (
@@ -41,17 +45,13 @@ export function MonthlyValueSummary() {
               <div style={{ fontSize: 13, fontWeight: 600, color: C.dark }}>{item.label}</div>
               <div style={{ fontSize: 11, color: C.muted }}>{item.sub}</div>
             </div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: item.color, letterSpacing: -0.5 }}>{item.value}</div>
           </div>
         ))}
       </div>
       <div style={{ padding: "12px 16px", background: C.mintLight, borderTop: `1px solid ${C.fresh}20` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <TrendingUp size={14} color={C.fresh} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.green }}>
-            spotloop hat 143 Wiederbesuche generiert — das sind ~1.030 € zusätzlicher Umsatz.
-          </span>
-        </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color: C.green, lineHeight: 1.5 }}>
+          Spotloop zeigt sichtbare Wiederkehr und Kundenbindung — keine garantierten Umsätze.
+        </span>
       </div>
     </div>
   );
@@ -156,8 +156,8 @@ export function RewardCostControls() {
 
 // ── Staff Roles ───────────────────────────────────────────────────────────────
 const ROLES = [
-  { id: "owner",   label: "Inhaber",     perms: ["Analytics", "Kampagnen", "QR", "Einlösungen", "Einstellungen"], color: C.green },
-  { id: "manager", label: "Manager",     perms: ["Analytics", "Kampagnen", "QR", "Einlösungen"], color: C.teal },
+  { id: "owner",   label: "Inhaber",     perms: ["Übersicht", "Kampagnen", "QR", "Einlösungen", "Einstellungen"], color: C.green },
+  { id: "manager", label: "Manager",     perms: ["Übersicht", "Kampagnen", "QR", "Einlösungen"], color: C.teal },
   { id: "staff",   label: "Mitarbeiter", perms: ["QR", "Einlösungen"], color: C.gold },
   { id: "cashier", label: "Kassierer",   perms: ["Einlösungen"], color: C.muted },
 ];
@@ -204,7 +204,7 @@ export function StaffRoles() {
                 >
                   <div style={{ background: C.bg, borderRadius: 12, padding: "10px 12px", marginBottom: 8 }}>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {["Analytics", "Kampagnen", "QR", "Einlösungen", "Einstellungen"].map(p => {
+                      {["Übersicht", "Kampagnen", "QR", "Einlösungen", "Einstellungen"].map(p => {
                         const has = role.perms.includes(p);
                         return (
                           <div key={p} style={{
@@ -231,56 +231,54 @@ export function StaffRoles() {
 }
 
 // ── Full Merchant Settings Page ───────────────────────────────────────────────
-export default function MerchantSettings({ onBack }) {
+export default function MerchantSettings({ onBack, onLogout, embedded = false, spotName }) {
   const { user, session } = useAuth();
   const [activeSection, setActiveSection] = useState("value");
 
   const SECTIONS = [
-    { id: "value",    label: "Monatsbericht",   icon: "📈" },
-    { id: "rewards",  label: "Budgetkontrolle", icon: "⚙️" },
-    { id: "staff",    label: "Team & Rollen",   icon: "👥" },
-    { id: "trust",    label: "Sicherheit",      icon: "🛡️" },
+    { id: "value", label: "Wiederkehr", icon: "🔄" },
+    { id: "pricing", label: "Abo-Pläne", icon: "💳" },
+    { id: "trust", label: "Sicherheit", icon: "🛡️" },
   ];
 
-  return (
-    <div style={{ background: C.bg, minHeight: "100%", paddingBottom: 24 }}>
-      {/* Header */}
-      <div style={{ background: CARD_GRADIENT, padding: "52px 20px 20px", position: "relative", overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
-          {onBack && (
-            <button onClick={onBack} style={{ background: "rgba(255,255,255,.1)", border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 18 }}>
-              ‹
-            </button>
-          )}
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>Einstellungen</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Betrieb & Sicherheit</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Section tabs */}
-      <div style={{ display: "flex", gap: 8, padding: "14px 16px 4px", overflowX: "auto" }}>
-        {SECTIONS.map(s => (
+  const body = (
+    <>
+      <div className={embedded ? "mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none" : "flex gap-2 overflow-x-auto px-4 py-3"}>
+        {SECTIONS.map((s) => (
           <button
             key={s.id}
+            type="button"
             onClick={() => setActiveSection(s.id)}
-            style={{
-              flexShrink: 0, borderRadius: 12, padding: "8px 14px",
-              background: activeSection === s.id ? C.green : C.white,
-              border: `1.5px solid ${activeSection === s.id ? C.green : C.border}`,
-              color: activeSection === s.id ? "#fff" : C.muted,
-              fontSize: 12, fontWeight: 700, cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 6,
-            }}
+            className={
+              embedded
+                ? `min-h-[44px] shrink-0 rounded-2xl px-5 text-[14px] font-bold transition ${
+                    activeSection === s.id
+                      ? "bg-[#0B1F3A] text-white shadow-sm"
+                      : "border border-[#E8E8E4] bg-white text-[#64748b]"
+                  }`
+                : undefined
+            }
+            style={
+              embedded
+                ? undefined
+                : {
+                    flexShrink: 0, borderRadius: 12, padding: "8px 14px",
+                    background: activeSection === s.id ? C.green : C.white,
+                    border: `1.5px solid ${activeSection === s.id ? C.green : C.border}`,
+                    color: activeSection === s.id ? "#fff" : C.muted,
+                    fontSize: 12, fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 6,
+                  }
+            }
           >
-            <span>{s.icon}</span>{s.label}
+            <span>{s.icon}</span> {s.label}
           </button>
         ))}
       </div>
 
-      <div style={{ padding: "12px 16px" }}>
+      <div style={embedded ? undefined : { padding: "12px 16px" }}>
         {activeSection === "value"   && <MonthlyValueSummary />}
+        {activeSection === "pricing" && <SpotloopPricing spotName={spotName} />}
         {activeSection === "rewards" && <RewardCostControls />}
         {activeSection === "staff"   && <StaffRoles />}
         {activeSection === "trust"   && (
@@ -328,6 +326,67 @@ export default function MerchantSettings({ onBack }) {
             )}
           </>
         )}
+      </div>
+
+      {onLogout && (
+        <button
+          type="button"
+          onClick={onLogout}
+          style={{
+            width: "100%",
+            marginTop: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            padding: "14px 16px",
+            background: C.white,
+            border: `1px solid ${C.border}`,
+            borderRadius: 14,
+            color: C.muted,
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          <LogOut size={18} strokeWidth={2.25} />
+          Abmelden
+        </button>
+      )}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="min-w-0 pb-8">
+        <div className="mb-6">
+          <h2 className="text-[20px] font-bold tracking-tight text-[#0B1F3A]">Einstellungen</h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-[#64748b]">
+            Betrieb, Team und Sicherheit — alles an einem Ort.
+          </p>
+        </div>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: C.bg, height: "100%", display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
+      <HeaderShell
+        paddingBottom={20}
+        style={{ paddingTop: "max(48px, calc(env(safe-area-inset-top) + 12px))", flexShrink: 0 }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          {onBack && <HeaderBackButton onClick={onBack} />}
+          <div>
+            <HeaderEyebrow>Merchant</HeaderEyebrow>
+            <HeaderTitle size={24}>Einstellungen</HeaderTitle>
+            <HeaderSubtitle>Betrieb & Sicherheit</HeaderSubtitle>
+          </div>
+        </div>
+      </HeaderShell>
+      <div className="scroll-y" style={{ paddingBottom: 32 }}>
+        {body}
       </div>
     </div>
   );

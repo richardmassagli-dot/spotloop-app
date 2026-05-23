@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
-import { Download, Printer, Share2, Check, Copy } from "lucide-react";
+import { Download, Printer, Check, Copy, ArrowLeft } from "lucide-react";
 import { C, CARD_GRADIENT } from "../../components/ui";
 
 const TEMPLATES = [
@@ -57,7 +57,7 @@ const BRAND_MESSAGES = [
   "Treuepunkte – ganz einfach",
 ];
 
-export default function MerchantBrandKit({ merchantId, spot }) {
+export default function MerchantBrandKit({ merchantId, spot, embedded, onBack }) {
   const [selected, setSelected] = useState("table_tent");
   const [message, setMessage] = useState(BRAND_MESSAGES[0]);
   const [copied, setCopied] = useState(false);
@@ -73,15 +73,33 @@ export default function MerchantBrandKit({ merchantId, spot }) {
   };
 
   return (
-    <div style={{ background: C.bg, minHeight: "100%", paddingBottom: 32 }}>
-      {/* Header */}
-      <div style={{ background: CARD_GRADIENT, padding: "52px 20px 20px" }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 2, fontWeight: 700, marginBottom: 3 }}>MERCHANT BRAND KIT</div>
-        <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>Marketing-Materialien</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 2 }}>Druck- und Digitalvorlagen</div>
-      </div>
+    <div style={embedded ? undefined : { background: C.bg, height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {!embedded && (
+        <div style={{ flexShrink: 0, background: CARD_GRADIENT, padding: "52px 20px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            {onBack && (
+              <button type="button" onClick={onBack} style={{ background: "rgba(255,255,255,.1)", border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff" }}>
+                <ArrowLeft size={18} />
+              </button>
+            )}
+            <div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 2, fontWeight: 700 }}>BRAND KIT</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>Marketing-Materialien</div>
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Druck- und Digitalvorlagen</div>
+        </div>
+      )}
 
-      <div style={{ padding: "16px" }}>
+      {embedded && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.dark }}>Brand Kit</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>QR-Vorlagen & Marketing-Material</div>
+        </div>
+      )}
+
+      <div style={embedded ? undefined : { flex: 1, minHeight: 0 }} className={embedded ? undefined : "scroll-y"}>
+      <div style={{ padding: embedded ? 0 : "16px", paddingBottom: 32 }}>
 
         {/* QR Preview Card */}
         <div style={{ background: "#fff", borderRadius: 20, padding: "20px", marginBottom: 16, border: `1px solid ${C.border}`, boxShadow: `0 4px 20px rgba(6,13,8,.08)` }}>
@@ -204,6 +222,7 @@ export default function MerchantBrandKit({ merchantId, spot }) {
             {copied ? <><Check size={14} /> Kopiert!</> : <><Copy size={14} /> Link kopieren</>}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

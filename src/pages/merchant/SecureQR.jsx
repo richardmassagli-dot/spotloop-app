@@ -5,7 +5,7 @@ import { RefreshCw, Shield, AlertTriangle, Copy, Check } from "lucide-react";
 import { C, CARD_GRADIENT } from "../../components/ui";
 import { SecureQRBadge, MerchantTrustBanner } from "../../components/trust";
 
-const QR_TTL = 60; // seconds before rotation
+const QR_TTL = 180; // seconds before rotation (mehr Zeit zum Scannen am Handy)
 
 function generateToken() {
   const arr = new Uint8Array(12);
@@ -17,7 +17,7 @@ function buildQRUrl(merchantId, token) {
   return `${window.location.origin}?checkin=${merchantId}&t=${token}&exp=${Date.now() + QR_TTL * 1000}`;
 }
 
-export default function SecureQR({ merchantId, spotName }) {
+export default function SecureQR({ merchantId, spotName, premium = false }) {
   const [token, setToken]     = useState(() => generateToken());
   const [ttl, setTtl]         = useState(QR_TTL);
   const [rotating, setRotating] = useState(false);
@@ -56,24 +56,32 @@ export default function SecureQR({ merchantId, spotName }) {
   const pct = (ttl / QR_TTL) * 100;
   const urgency = ttl < 10;
 
-  return (
-    <div>
-      {/* QR Card */}
-      <div style={{
+  const cardStyle = premium
+    ? undefined
+    : {
         background: C.white, borderRadius: 22, padding: "24px",
         border: `2px solid ${urgency ? `${C.orange}60` : `${C.green}30`}`,
         boxShadow: `0 8px 32px rgba(10,61,39,.12)`,
         textAlign: "center", marginBottom: 16,
         transition: "border-color .3s",
-      }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>{spotName}</div>
-            <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Sicherer Check-in QR</div>
+      };
+
+  return (
+    <div>
+      {/* QR Card */}
+      <div
+        className={premium ? `rounded-[24px] border bg-white p-6 text-center shadow-[0_8px_28px_rgba(11,31,58,0.08)] mb-4 ${urgency ? "border-[#FF6B5A]/40" : "border-[#E8E8E4]/80"}` : undefined}
+        style={cardStyle}
+      >
+        {!premium && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>{spotName}</div>
+              <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Sicherer Check-in QR</div>
+            </div>
+            <SecureQRBadge />
           </div>
-          <SecureQRBadge />
-        </div>
+        )}
 
         {/* QR Code */}
         <AnimatePresence mode="wait">

@@ -4,9 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    target: ['es2020', 'safari14'],
+  },
   server: {
     host: true, // localhost + 127.0.0.1 (vermeidet ERR_CONNECTION_REFUSED)
     port: 5173,
-    strictPort: true,
+    strictPort: false,
   },
 })

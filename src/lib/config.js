@@ -10,3 +10,13 @@ export const IS_LOCAL_MODE = !(hasUrl && hasAnon);
 export const SHOW_DEMO_DATA = IS_LOCAL_MODE;
 
 export const APP_NAME = "myspot";
+
+/** E-Mail in Supabase `app_bootstrap_emails` → Admin + eigene Spot-Freigabe (Migration 004). */
+export const ENABLE_DEV_BOOTSTRAP = import.meta.env.VITE_ENABLE_DEV_BOOTSTRAP === "true";
+
+/**
+ * Nur Header ohne Tabs (optional): VITE_MERCHANT_CLASSIC=true
+ * Standard: volles Spot-Dashboard mit Übersicht, QR, Kampagne …
+ */
+export const MERCHANT_CLASSIC =
+  import.meta.env.VITE_MERCHANT_CLASSIC === "true";

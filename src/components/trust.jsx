@@ -94,7 +94,7 @@ export function MerchantTrustBanner() {
     <div style={{ background: C.mintLight, border: `1px solid ${C.fresh}20`, borderRadius: 14, padding: "12px 14px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <ShieldCheck size={16} color={C.fresh} />
-        <span style={{ fontSize: 13, fontWeight: 800, color: C.green }}>Deine Follower-Daten sind geschützt</span>
+        <span style={{ fontSize: 13, fontWeight: 800, color: C.green }}>Deine Gast-Daten sind geschützt</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
         {[

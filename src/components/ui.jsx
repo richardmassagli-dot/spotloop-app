@@ -1,119 +1,105 @@
 // ─── spotloop Design System v2 ────────────────────────────────────
-// Palette: Deep Navy · Ocean Blue · Sky Teal
-// Feeling: Premium · Modern · Trustworthy · Minimal · App-Store Ready
+import { C, CARD_GRADIENT } from "../design/tokens.js";
 
-export const C = {
-  // ── Brand Primaries ──────────────────────────────────────────────
-  navy:        "#0A1628",   // Deepest dark — hero backgrounds, headings
-  blue:        "#1B4FD8",   // Ocean blue — primary CTA, active states
-  sky:         "#0EA5E9",   // Sky blue — accents, highlights
-  cyan:        "#06B6D4",   // Cyan — fresh accent
-  cyanLight:   "#ECFEFF",   // Very light cyan
-
-  // ── Backwards-compat aliases (screens use these names) ──────────
-  green:       "#1B4FD8",   // → primary blue
-  fresh:       "#06B6D4",   // → cyan
-  teal:        "#0EA5E9",   // → sky blue
-  tealMid:     "#0EA5E9",
-  mint:        "#BAE6FD",   // light blue (was mint green)
-  mintLight:   "#EFF6FF",   // very light blue
-  tealLight:   "#E0F2FE",
-  darkGreen:   "#0A1628",   // → navy
-
-  // ── Backgrounds ──────────────────────────────────────────────────
-  bg:          "#F7F9FF",   // Off-white with blue tint — main app bg
-  white:       "#FFFFFF",
-  card:        "#FFFFFF",
-
-  // ── Typography ───────────────────────────────────────────────────
-  dark:        "#0A1628",   // Deep navy — primary text
-  mid:         "#1E2D45",
-  muted:       "#64748B",   // Blue-gray muted text
-  light:       "#94A3B8",
-
-  // ── Semantic ─────────────────────────────────────────────────────
-  orange:      "#F97316",   // Warm coral — rewards, CTAs
-  orangeLight: "#FFF7ED",
-  gold:        "#F59E0B",
-  goldLight:   "#FFFBEB",
-  purple:      "#6366F1",
-  purpleLight: "#EEF2FF",
-  red:         "#EF4444",
-
-  // ── Chrome ───────────────────────────────────────────────────────
-  border:      "#E2E8F5",   // Cool blue-tinted border
-  shadow:      "rgba(10,22,40,.05)",
-  shadowMd:    "rgba(10,22,40,.10)",
-  shadowLg:    "rgba(10,22,40,.20)",
-};
-
-// Primary gradient — deep navy → ocean blue → sky
-export const CARD_GRADIENT = "linear-gradient(145deg, #0A1628 0%, #1B4FD8 55%, #0EA5E9 100%)";
+export { C, CARD_GRADIENT };
 
 // ─── Screen ───────────────────────────────────────────────────────
 export function Screen({ children, bg = C.bg, pad = true, scroll = true }) {
   return (
-    <div style={{
-      background: bg,
-      minHeight: "100%",
-      padding: pad ? "0 0 88px" : 0,
-      fontFamily: "'Inter', -apple-system, 'Helvetica Neue', sans-serif",
-      overflowY: scroll ? "auto" : "hidden",
-    }}>
+    <div
+      className={scroll ? "scroll-y" : undefined}
+      style={{
+        background: bg,
+        height: "100%",
+        padding: pad ? "0 0 88px" : 0,
+        fontFamily: "'Inter', -apple-system, 'Helvetica Neue', sans-serif",
+        overflowY: scroll ? undefined : "hidden",
+      }}
+    >
       {children}
     </div>
   );
 }
 
 // ─── Logo ─────────────────────────────────────────────────────────
-// Concept: Concentric horseshoe arcs (loop) + pin dot = location loop
-export function Logo({ size = 28, light = false, hideText = false }) {
-  const uid   = light ? "lt" : "dk";
-  const c1    = light ? "#FFFFFF" : "#1B4FD8";
-  const c2    = light ? "rgba(255,255,255,.65)" : "#0EA5E9";
-  const text  = light ? "#FFFFFF" : C.navy;
+const LOGO_LOCKUP = "/brand/spotloop-mark.svg";
+const LOGO_MARK = "/brand/spotloop-mark.svg";
+const MARK_ASPECT = 1;
+
+/** Offizielles Spotloop-Symbol (transparentes PNG, exakt wie Brand). */
+export function SpotloopIcon({ size = 28, light = false }) {
+  const h = Math.round(size);
+  const w = Math.round(h * MARK_ASPECT);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: Math.round(size * 0.38) }}>
-      {/* Icon: double horseshoe + pin dot */}
-      <svg width={Math.round(size * 0.9)} height={Math.round(size * 1.05)} viewBox="0 0 22 26" fill="none">
-        <defs>
-          <linearGradient id={`slg-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={c1} />
-            <stop offset="100%" stopColor={c2} />
-          </linearGradient>
-        </defs>
-        {/* Outer horseshoe — 300° arc, open at bottom, center (11,10) r≈9 */}
-        <path
-          d="M 3 14 A 9 9 0 1 1 19 14"
-          stroke={`url(#slg-${uid})`}
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* Inner horseshoe — 300° arc, center (11,10) r≈5 */}
-        <path
-          d="M 8 14 A 5 5 0 1 1 14 14"
-          stroke={`url(#slg-${uid})`}
-          strokeWidth="2"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.52"
-        />
-        {/* Pin dot — below the opening */}
-        <circle cx="11" cy="22" r="2.1" fill={`url(#slg-${uid})`} />
-      </svg>
+    <img
+      src={LOGO_MARK}
+      alt=""
+      width={w}
+      height={h}
+      aria-hidden
+      style={{
+        display: "block",
+        width: w,
+        height: h,
+        objectFit: "contain",
+        flexShrink: 0,
+        filter: light ? "none" : "brightness(0)",
+      }}
+    />
+  );
+}
+
+/** Symbol + „spotloop“ direkt nebeneinander. hideText = nur Symbol. */
+export function Logo({ size = 28, light = false, hideText = false }) {
+  const textColor = light ? "#FFFFFF" : C.navy;
+  const fontSize = Math.round(size * 0.82);
+
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 0,
+        lineHeight: 1,
+      }}
+    >
+      <SpotloopIcon size={fontSize} light={light} />
       {!hideText && (
-        <span style={{
-          fontSize: Math.round(size * 0.75),
-          fontWeight: 800,
-          color: text,
-          letterSpacing: -0.5,
-          lineHeight: 1,
-        }}>
+        <span
+          style={{
+            fontSize,
+            fontWeight: 600,
+            color: textColor,
+            letterSpacing: -0.35,
+            fontFamily: "'Inter', -apple-system, 'Helvetica Neue', sans-serif",
+            margin: 0,
+            marginLeft: 3,
+            padding: 0,
+            lineHeight: 1,
+          }}
+        >
           spotloop
         </span>
       )}
     </div>
+  );
+}
+
+/** Vertikales PNG-Lockup (Ladebildschirm, Marketing). */
+export function LogoLockup({ height = 72, light = false, style = {} }) {
+  return (
+    <img
+      src={LOGO_LOCKUP}
+      alt="spotloop"
+      style={{
+        height,
+        width: "auto",
+        objectFit: "contain",
+        display: "block",
+        ...(light ? { mixBlendMode: "screen" } : { filter: "invert(1)" }),
+        ...style,
+      }}
+    />
   );
 }
 
@@ -138,7 +124,7 @@ export function PremiumCard({ profile, totalPoints = 0, readyCount = 0, style = 
 
       {/* Top row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, position: "relative" }}>
-        <Logo size={19} light />
+        <Logo size={20} light />
         <div style={{ background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 99, padding: "3px 11px" }}>
           <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.5)", letterSpacing: 2 }}>MEMBER</span>
         </div>
@@ -184,7 +170,7 @@ export function Btn({ children, onClick, variant = "primary", full = true, small
     fresh:     { background: CARD_GRADIENT,color:"#fff",   border: "none",                     boxShadow: `0 4px 18px rgba(10,22,40,.28)` },
   };
   return (
-    <button onClick={onClick} disabled={disabled} style={{
+    <button type="button" onClick={onClick} disabled={disabled} style={{
       ...variants[variant],
       width: full ? "100%" : "auto",
       padding: small ? "9px 16px" : "14px 20px",
@@ -306,27 +292,6 @@ export function Alert({ type = "info", children }) {
   return (
     <div style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: 12, padding: "11px 14px", fontSize: 13, color: s.color, fontWeight: 600, marginBottom: 12 }}>
       {children}
-    </div>
-  );
-}
-
-// ─── Stamp Grid ───────────────────────────────────────────────────
-export function StampGrid({ pts, max, color = C.blue }) {
-  return (
-    <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-      {Array.from({ length: max }).map((_, i) => (
-        <div key={i} style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: i < pts ? color : C.border,
-          border: `1.5px solid ${i < pts ? color : C.border}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 11, color: i < pts ? "#fff" : C.light,
-          transition: "all .22s",
-          boxShadow: i < pts ? `0 2px 6px ${color}35` : "none",
-        }}>
-          {i < pts ? "✓" : ""}
-        </div>
-      ))}
     </div>
   );
 }

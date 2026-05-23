@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Gift, ChevronRight, X, Check, Clock, Zap, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getUserStamps, redeemStamp } from "../../lib/firestore";
-import { C, CARD_GRADIENT, Spinner, StampGrid, ProgressBar } from "../../components/ui";
-import { demoStamps, demoTransactions, demoPosts } from "../../lib/demoData";
+import { C, CARD_GRADIENT, Spinner, ProgressBar } from "../../components/ui";
+import StampGrid from "../../components/stamp/StampSlots";
+import { demoStamps, demoTransactions } from "../../lib/demoData";
 
 const FOLLOW_KEY = "spotloop_followed";
 const getLocalFollowed = () => { try { return JSON.parse(localStorage.getItem(FOLLOW_KEY) || "[]"); } catch { return []; } };
-const NEW_POST_SPOT_IDS = new Set(demoPosts.filter(p => p.is_new).map(p => p.spot_id));
 
 const FILTERS = ["Alle", "Einlösbar", "In Arbeit", "Läuft ab", "Neu"];
 
@@ -77,7 +77,7 @@ export default function WalletScreen({ onSpotClick }) {
     }
   };
 
-  const totalPoints = stamps.reduce((a, s) => a + s.points, 0);
+  const totalStamps = stamps.reduce((a, s) => a + (s.points || 0), 0);
   const readyCount = stamps.filter(s => s.reward_ready).length;
   const expiringCount = stamps.filter(s => {
     const d = daysUntilExpiry(s.expires_at);
@@ -135,25 +135,16 @@ export default function WalletScreen({ onSpotClick }) {
           <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,.03)" }} />
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 5 }}>GESAMMELTE PUNKTE</div>
-              <motion.div
-                key={totalPoints}
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                style={{ fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: -2.5, lineHeight: 1 }}
-              >
-                {totalPoints.toLocaleString("de")}
-              </motion.div>
-            </div>
-            <div style={{ background: "rgba(255,255,255,.1)", borderRadius: 12, padding: "6px 14px", textAlign: "right" }}>
-              <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,.5)", letterSpacing: 1.5 }}>MEMBER</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 2, fontWeight: 700, marginBottom: 3 }}>WALLET</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: -0.8 }}>Stempel & Rewards</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginTop: 6 }}>Pro Spot — keine allgemeinen Punkte</div>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 20, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ display: "flex", gap: 20, paddingTop: 4 }}>
             {[
-              { val: stamps.length, label: "Karten", icon: "💳" },
-              { val: stamps.reduce((a, s) => a + (s.total_checkins || s.points), 0), label: "Besuche", icon: "📍" },
+              { val: stamps.length, label: "Spots", icon: "📍" },
+              { val: totalStamps, label: "Stempel", icon: "⭐" },
               { val: readyCount, label: "Rewards", icon: "🎁", highlight: readyCount > 0 },
             ].map((s, i) => (
               <div key={i}>
@@ -281,7 +272,7 @@ export default function WalletScreen({ onSpotClick }) {
                 transition={{ delay: i * 0.06 }}
                 onClick={() => setSelected(stamp)}
               >
-                <WalletCard stamp={stamp} hasNewPost={followedIds.includes(stamp.spot_id) && NEW_POST_SPOT_IDS.has(stamp.spot_id)} onRedeem={(e) => { e.stopPropagation(); setSelected(stamp); }} />
+                <WalletCard stamp={stamp} onRedeem={(e) => { e.stopPropagation(); setSelected(stamp); }} />
               </motion.div>
             ))}
           </div>
@@ -313,7 +304,7 @@ export default function WalletScreen({ onSpotClick }) {
 }
 
 // ── Wallet Card ───────────────────────────────────────────────────────────────
-function WalletCard({ stamp, hasNewPost }) {
+function WalletCard({ stamp }) {
   const spot    = stamp.spot;
   const bg      = spot?.bg_color || C.green;
   const days    = daysUntilExpiry(stamp.expires_at);
@@ -339,13 +330,6 @@ function WalletCard({ stamp, hasNewPost }) {
       opacity: expired ? 0.65 : 1,
       transition: "box-shadow .2s, transform .15s",
     }}>
-      {/* New post indicator */}
-      {hasNewPost && !urgentExpiry && !expired && (
-        <div style={{ background: `${bg}12`, padding: "4px 16px", display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: bg }} />
-          <span style={{ fontSize: 10, fontWeight: 800, color: bg }}>Neue Nachricht · Jetzt ansehen</span>
-        </div>
-      )}
       {/* Expiry urgency strip */}
       {urgentExpiry && (
         <div style={{ background: days <= 3 ? `${C.orange}15` : "rgba(214,138,12,.1)", padding: "5px 16px", display: "flex", alignItems: "center", gap: 6 }}>
@@ -496,7 +480,7 @@ function CardDetailSheet({ stamp, redeeming, redeemed, onClose, onRedeem, onSpot
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: bg }}>{stamp.reward_text}</div>
                   <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
-                    Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Punkte
+                    Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Stempel bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong>
                   </div>
                 </div>
               )}
@@ -634,7 +618,7 @@ function HistorySheet({ onClose }) {
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: style.color }}>
-                    {t.points > 0 ? `+${t.points}` : t.points} Pkt
+                    {t.points > 0 ? `+${t.points}` : t.points} Stempel
                   </div>
                   <div style={{ fontSize: 10, color: C.muted }}>{t.date}</div>
                 </div>

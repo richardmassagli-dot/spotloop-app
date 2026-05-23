@@ -40,6 +40,23 @@ supabase/schema.sql
 
 Ohne `id = merchant_id` funktionieren QR-Code, Dashboard und `createSpot()` nicht.
 
+### Zusätzliche Migrationen (Posts & Gast-Feed)
+
+Im **SQL Editor** nacheinander ausführen (falls noch nicht geschehen):
+
+| Datei | Zweck |
+|-------|--------|
+| `supabase/migrations/012_merchant_posts.sql` | Händler darf Posts/Kampagnen speichern |
+| `supabase/migrations/013_campaigns_guest_read.sql` | Gäste lesen Kampagnen von gefolgten Spots |
+| `supabase/migrations/014_guest_feed_rpc.sql` | **Wichtig:** Gast-Feed per RPC (My Spots + Spot-Updates) |
+| `supabase/scripts/apply_pending_015_017.sql` | Nachrichten, Kampagnen-Bilder, Privacy, **Communities** (015–018) |
+
+Ohne **012–014** sieht der Gast keine Posts/Kampagnen, auch wenn der Händler sie veröffentlicht hat.
+
+**Schnell (015–018):** `npm run migrate:pending` — oder SQL-Datei `supabase/scripts/apply_pending_015_017.sql` im SQL Editor ausführen.
+
+Community-Konzept: `docs/COMMUNITY_PRIVACY.md`
+
 ## 4. Row Level Security
 
 Ist bereits in `supabase/schema.sql` enthalten (Spots lesbar, Händler schreibt eigenen Spot, Gäste eigene Stamps/Follows).
@@ -112,5 +129,7 @@ Supabase **Site URL** auf deine Vercel-Domain setzen.
 | „Spot nicht gefunden“ beim Check-in | Händler-Setup abgeschlossen? `spots`-Zeile mit `id = merchant uuid`? |
 | Registrierung schlägt fehl | Email-Provider an, Confirmations aus (Dev) |
 | RLS-Fehler beim Stamp | `schema.sql` vollständig ausgeführt? |
+| Gast sieht keine Posts/Kampagnen | Migrationen **012–014** ausführen; Gast muss Spot **folgen** (Herz) oder Stempelkarte haben; Spot `verified` |
+| Händler kann nicht posten | Migration **012**; Spot freigeschaltet (`verification_status = verified`) |
 
 Mehr Details: `PRODUCTION.md`

@@ -2,6 +2,7 @@
 import { localAuth } from "./localStore.js";
 import { supabase } from "./supabase.js";
 import { IS_LOCAL_MODE } from "./config.js";
+import { translate, authErrorKey, getStoredLocale } from "../i18n/index.js";
 
 const LOCAL = IS_LOCAL_MODE;
 const AUTH_EVENT = "myspot-auth-change";
@@ -24,32 +25,9 @@ export const emitAuthFromSession = (session) => {
   emitAuth({ session });
 };
 
-/** German messages for Supabase / local auth errors */
-export const authErrorMessage = (error, context = "register") => {
-  const code = error?.code || "";
-  const msg  = error?.message || "";
-
-  if (code === "email_confirmation_required")
-    return "Bitte bestätige deine E-Mail über den Link in deinem Postfach. Danach kannst du dich anmelden.";
-  if (code === "user_already_exists" || msg.includes("already registered"))
-    return "E-Mail bereits registriert.";
-  if (code === "email_address_invalid")
-    return "Ungültige E-Mail-Adresse.";
-  if (code === "over_email_send_rate_limit")
-    return "Zu viele Versuche. Bitte in ein paar Minuten erneut versuchen.";
-  if (code === "email_not_confirmed" || msg.includes("Email not confirmed"))
-    return "Bitte bestätige zuerst deine E-Mail (Link im Postfach).";
-  if (code === "invalid_credentials")
-    return "E-Mail oder Passwort falsch.";
-  if (code === "weak_password")
-    return "Passwort zu schwach (mindestens 6 Zeichen).";
-  if (code === "no_session")
-    return "Anmeldung fehlgeschlagen — keine Sitzung erhalten. Bitte E-Mail bestätigen oder später erneut versuchen.";
-
-  return context === "login"
-    ? "E-Mail oder Passwort falsch."
-    : "Registrierung fehlgeschlagen. Bitte versuche es erneut.";
-};
+/** Localized Supabase / local auth errors */
+export const authErrorMessage = (error, context = "register", locale = getStoredLocale()) =>
+  translate(locale, authErrorKey(error, context));
 
 /** Ensure session is loaded and AuthContext is notified (Supabase). */
 const finalizeSupabaseAuth = async (data) => {
@@ -120,6 +98,13 @@ export const storeRegister = async (email, password, name, role, birthday) => {
 
   if (data.session) return requireSession(data);
 
+  // Konto angelegt, aber Supabase liefert keine Session bis die E-Mail bestätigt ist
+  if (data.user) {
+    const pending = new Error("Email confirmation required");
+    pending.code = "email_confirmation_required";
+    throw pending;
+  }
+
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
   if (signInError) {
     if (signInError.code === "email_not_confirmed" || signInError.message?.includes("not confirmed")) {
@@ -168,7 +153,12 @@ export const storeOnAuthStateChanged = (cb) => {
   };
   window.addEventListener(AUTH_EVENT, onExternal);
 
-  supabase.auth.getSession().then(({ data: { session } }) => notifyFromSession(session));
+  if (!supabase) {
+    notifyFromSession(null);
+    return () => window.removeEventListener(AUTH_EVENT, onExternal);
+  }
+
+  supabase.auth.getSession().then(({ data: { session } }) => notifyFromSession(session)).catch(() => notifyFromSession(null));
 
   const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
     notifyFromSession(session);

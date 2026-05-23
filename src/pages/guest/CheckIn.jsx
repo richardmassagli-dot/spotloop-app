@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Shield, Clock, Zap, Check } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getSpot, getOrCreateStamp, addStamp } from "../../lib/firestore";
-import { Screen, Btn, Card, ProgressBar, BackBtn, Tag, C, Spinner, StampGrid, CARD_GRADIENT } from "../../components/ui";
+import { Screen, Btn, Card, ProgressBar, BackBtn, Tag, C, Spinner, CARD_GRADIENT } from "../../components/ui";
+import StampGrid from "../../components/stamp/StampSlots";
 import { ScanCooldownBadge, PrivacyNote } from "../../components/trust";
 import CheckInConsent, { hasConsented, markConsented } from "./CheckInConsent";
+import { savePrivacyPrefs } from "../../lib/privacy";
 import QRScanner from "../../components/QRScanner";
 import { demoSpots } from "../../lib/demoData";
 
@@ -28,7 +30,7 @@ function fmtCooldown(ms) {
   return mins >= 60 ? `${Math.ceil(mins / 60)}h ${mins % 60}min` : `${mins} min`;
 }
 
-export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
+export default function CheckInPage({ spotId, onBack, onSpotDetected, onComplete }) {
   const { user } = useAuth();
   const [spot, setSpot]     = useState(null);
   const [stamp, setStamp]   = useState(null);
@@ -37,6 +39,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
   const [saving, setSaving]     = useState(false);
   const [showConsent, setShowConsent] = useState(false);
   const [cooldownMs, setCooldownMs]   = useState(0);
+  const autoCollected = useRef(false);
 
   useEffect(() => {
     if (!spotId) { setLoading(false); return; }
@@ -71,13 +74,11 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
       });
   }, [spotId, user.uid]);
 
-  const handleConsentAccept = (selections) => {
-    markConsented(user.uid, spotId || "demo");
-    setShowConsent(false);
-  };
-
-  const collectPoint = async () => {
-    if (cooldownMs > 0) return;
+  const collectPoint = useCallback(async () => {
+    if (cooldownMs > 0) {
+      setStep(1);
+      return;
+    }
     setSaving(true);
     try {
       const updated = await addStamp(user.uid, spotId);
@@ -85,7 +86,6 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
       setCooldown(user.uid, spotId);
       setStep(1);
     } catch {
-      // demo mode fallback
       const next = { ...stamp, points: Math.min((stamp?.points || 0) + 1, stamp?.max_points || 8) };
       next.reward_ready = next.points >= next.max_points;
       setStamp(next);
@@ -93,6 +93,36 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
       setStep(1);
     }
     setSaving(false);
+  }, [cooldownMs, spotId, stamp, user.uid]);
+
+  useEffect(() => {
+    if (step !== 1 || !onComplete) return;
+    const t = setTimeout(() => onComplete(), 2600);
+    return () => clearTimeout(t);
+  }, [step, onComplete]);
+
+  useEffect(() => {
+    if (loading || showConsent || !spot || !stamp || step !== 0 || autoCollected.current) return;
+    autoCollected.current = true;
+    collectPoint();
+  }, [loading, showConsent, spot, stamp, step, collectPoint]);
+
+  const handleConsentAccept = async (selections = {}) => {
+    markConsented(user.uid, spotId || "demo");
+    await savePrivacyPrefs(user.uid, {
+      push_campaigns: !!selections.campaigns,
+      push_nearby: !!selections.location,
+      location_nearby: !!selections.location,
+      loyalty_active: true,
+    });
+    if (selections.location && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(() => {}, () => {}, {
+        enableHighAccuracy: false,
+        maximumAge: 600000,
+        timeout: 8000,
+      });
+    }
+    setShowConsent(false);
   };
 
   // ── No spot ID: Kamera-QR-Scanner ──
@@ -142,7 +172,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
           transition={{ delay: 0.15 }}
         >
           <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 4, letterSpacing: -0.5 }}>
-            {stamp.reward_ready ? "Reward freigeschaltet!" : "Punkt gesammelt!"}
+            {stamp.reward_ready ? "Reward freigeschaltet!" : cooldownMs > 0 ? "Schon eingecheckt!" : "Stempel gesammelt!"}
           </div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.8)" }}>{spot.name}</div>
         </motion.div>
@@ -164,7 +194,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
             </div>
           ) : (
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.65)", marginTop: 8 }}>
-              Noch {stamp.max_points - stamp.points} Punkte bis: {spot.reward_text}
+              Noch {stamp.max_points - stamp.points} Stempel bis: {spot.reward_text}
             </div>
           )}
         </motion.div>
@@ -188,10 +218,9 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
     </div>
   );
 
-  // ── CONFIRM ──
+  // ── CONFIRM (Auto-Check-in) ──
   return (
-    <div style={{ height: "100%", overflowY: "auto", background: C.bg }}>
-      {/* Consent overlay */}
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: C.bg, padding: 24 }}>
       {showConsent && (
         <CheckInConsent
           spot={spot}
@@ -199,106 +228,9 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected }) {
           onDecline={() => { setShowConsent(false); onBack(); }}
         />
       )}
-
-      {/* Header */}
-      <div style={{ background: `linear-gradient(135deg, ${bg}20, ${bg}08)`, padding: "48px 20px 20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <BackBtn onClick={onBack} />
-          {cooldownMs > 0 ? (
-            <ScanCooldownBadge seconds={Math.ceil(cooldownMs / 1000)} />
-          ) : (
-            <span style={{ background: C.mintLight, color: C.green, borderRadius: 99, padding: "4px 12px", fontSize: 10, fontWeight: 800 }}>
-              📍 Bereit zum Scannen
-            </span>
-          )}
-        </div>
-
-        <div style={{ textAlign: "center" }}>
-          <div style={{ width: 72, height: 72, borderRadius: 22, background: `${bg}22`, border: `2px solid ${bg}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, margin: "0 auto 12px" }}>
-            {spot.emoji || "🏪"}
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: C.dark, letterSpacing: -0.5 }}>{spot.name}</div>
-          <div style={{ fontSize: 13, color: C.muted }}>{spot.category}{spot.area ? ` · ${spot.area}` : ""}</div>
-        </div>
-      </div>
-
-      <div style={{ padding: "16px 20px 32px" }}>
-        {/* Action banner */}
-        {spot.current_action && (
-          <div style={{ background: `${C.orange}10`, border: `1.5px solid ${C.orange}30`, borderRadius: 12, padding: "10px 14px", marginBottom: 14, display: "flex", gap: 8, alignItems: "center" }}>
-            <Zap size={14} color={C.orange} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.orange }}>{spot.current_action}</span>
-          </div>
-        )}
-
-        {/* Stamp card */}
-        <div style={{ background: "#fff", borderRadius: 18, padding: "16px", marginBottom: 14, border: `1px solid ${C.border}`, boxShadow: `0 3px 14px rgba(6,13,8,.07)` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>Deine Stempelkarte</div>
-            <div style={{ fontSize: 14, fontWeight: 900, color: bg }}>{stamp.points}<span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>/{stamp.max_points}</span></div>
-          </div>
-          <StampGrid pts={stamp.points} max={stamp.max_points} color={bg} />
-          <div style={{ marginTop: 10 }}>
-            <ProgressBar value={stamp.points} max={stamp.max_points} color={bg} height={6} bg={`${bg}15`} />
-          </div>
-          <div style={{ marginTop: 8, fontSize: 12, color: C.muted }}>
-            Reward: <strong style={{ color: C.dark }}>{spot.reward_text}</strong>
-          </div>
-        </div>
-
-        {/* Reward ready */}
-        {stamp.reward_ready && (
-          <div style={{ background: `${C.orange}10`, border: `2px solid ${C.orange}50`, borderRadius: 16, padding: "16px", marginBottom: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 32, marginBottom: 6 }}>🎁</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: C.dark }}>Reward bereit!</div>
-            <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{spot.reward_text} – zeig es dem Personal</div>
-          </div>
-        )}
-
-        {/* Cooldown warning */}
-        {cooldownMs > 0 && (
-          <div style={{ marginBottom: 14 }}>
-            <PrivacyNote variant="warning">
-              ⏱ Du kannst in {fmtCooldown(cooldownMs)} wieder einchecken. (Anti-Fraud Schutz · 2h Mindestabstand)
-            </PrivacyNote>
-          </div>
-        )}
-
-        {/* CTA */}
-        {!stamp.reward_ready && (
-          <div style={{ background: `linear-gradient(135deg, ${bg}, ${C.fresh})`, borderRadius: 16, padding: "18px 20px", marginBottom: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginBottom: 3 }}>Sammle jetzt</div>
-            <div style={{ fontSize: 36, fontWeight: 900, color: "#fff", letterSpacing: -1 }}>+1 Punkt</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 4 }}>
-              Neuer Stand: {(stamp.points || 0) + 1}/{stamp.max_points}
-            </div>
-          </div>
-        )}
-
-        <motion.button
-          whileTap={cooldownMs > 0 ? {} : { scale: 0.97 }}
-          onClick={collectPoint}
-          disabled={saving || cooldownMs > 0}
-          style={{
-            width: "100%",
-            background: cooldownMs > 0 ? C.border : CARD_GRADIENT,
-            color: cooldownMs > 0 ? C.muted : "#fff",
-            border: "none", borderRadius: 14, padding: "15px",
-            fontSize: 15, fontWeight: 800,
-            cursor: saving || cooldownMs > 0 ? "not-allowed" : "pointer",
-            boxShadow: cooldownMs > 0 ? "none" : "0 6px 20px rgba(10,61,39,.25)",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          }}
-        >
-          {saving ? (
-            <><Spinner size={18} color="#fff" /> Wird gespeichert…</>
-          ) : cooldownMs > 0 ? (
-            <><Clock size={16} /> Wieder verfügbar in {fmtCooldown(cooldownMs)}</>
-          ) : (
-            <><Check size={16} /> Punkt sichern</>
-          )}
-        </motion.button>
-      </div>
+      <Spinner size={40} />
+      <div style={{ marginTop: 16, fontSize: 14, fontWeight: 700, color: C.dark }}>{spot.name}</div>
+      <div style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{saving ? "Stempel wird gespeichert…" : "Check-in…"}</div>
     </div>
   );
 }

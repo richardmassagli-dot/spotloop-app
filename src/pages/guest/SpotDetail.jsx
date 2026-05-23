@@ -4,12 +4,24 @@ import {
   ArrowLeft, Heart, MapPin, Clock, Star, Shield, QrCode,
   CheckCircle, Gift, Share2, Phone, Globe,
   Wifi, PawPrint, Leaf, CreditCard, ChevronRight, Zap,
-  CalendarDays, ThumbsUp,
+  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { getSpot, getOrCreateStamp, followSpot, unfollowSpot, isFollowing } from "../../lib/firestore";
-import { C, CARD_GRADIENT, Spinner, StampGrid, ProgressBar } from "../../components/ui";
+import {
+  getSpot,
+  getOrCreateStamp,
+  followSpot,
+  unfollowSpot,
+  isFollowing,
+  getSpotCampaignUpdates,
+} from "../../lib/firestore";
+import { isCampaignCouponItem } from "../../lib/campaignCoupon";
+import { C, CARD_GRADIENT, Spinner, ProgressBar } from "../../components/ui";
+import StampGrid from "../../components/stamp/StampSlots";
 import { demoSpots, demoStamps } from "../../lib/demoData";
+import SpotCampaignCoupons, { spotCouponVisibleOnSpotPage } from "../../components/guest/SpotCampaignCoupons";
+import FollowVsCollectCard from "../../components/product/FollowVsCollectCard";
+import CouponRevealSheet from "../../components/guest/CouponRevealSheet";
 
 const FOLLOW_KEY = "spotloop_followed";
 const getLocalFollowed = () => { try { return JSON.parse(localStorage.getItem(FOLLOW_KEY) || "[]"); } catch { return []; } };
@@ -20,7 +32,6 @@ const TABS = [
   { id: "menu",      label: "Menü",       emoji: "🍽️" },
   { id: "gallery",   label: "Galerie",    emoji: "📸" },
   { id: "events",    label: "Events",     emoji: "🎉" },
-  { id: "updates",   label: "Updates",    emoji: "📢" },
 ];
 
 export default function SpotDetail({ spotId, onBack, onCheckin }) {
@@ -32,6 +43,9 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
   const [tab, setTab]               = useState("overview");
   const [showRedeemSheet, setShowRedeemSheet] = useState(false);
   const [redeemed, setRedeemed]     = useState(false);
+  const [spotCoupons, setSpotCoupons] = useState([]);
+  const [couponsLoading, setCouponsLoading] = useState(true);
+  const [couponItem, setCouponItem] = useState(null);
   const tabRef = useRef(null);
 
   useEffect(() => {
@@ -52,6 +66,45 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
       setLoading(false);
     });
   }, [spotId, user.uid]);
+
+  useEffect(() => {
+    if (!spotId || !spot) return;
+    let cancelled = false;
+    setCouponsLoading(true);
+    getSpotCampaignUpdates(spotId, spot, user.uid)
+      .then((items) => {
+        if (cancelled) return;
+        const coupons = (items ?? [])
+          .filter(isCampaignCouponItem)
+          .filter((item) => spotCouponVisibleOnSpotPage(item, { following, hasStamp: Boolean(stamp) }));
+        setSpotCoupons(coupons);
+      })
+      .catch(() => {
+        if (!cancelled) setSpotCoupons([]);
+      })
+      .finally(() => {
+        if (!cancelled) setCouponsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [spotId, spot, user.uid, following, stamp]);
+
+  useEffect(() => {
+    const onCampaign = () => {
+      if (!spotId || !spot) return;
+      getSpotCampaignUpdates(spotId, spot, user.uid).then((items) => {
+        const coupons = (items ?? [])
+          .filter(isCampaignCouponItem)
+          .filter((item) =>
+            spotCouponVisibleOnSpotPage(item, { following, hasStamp: Boolean(stamp) }),
+          );
+        setSpotCoupons(coupons);
+      });
+    };
+    window.addEventListener("spotloop:campaign", onCampaign);
+    return () => window.removeEventListener("spotloop:campaign", onCampaign);
+  }, [spotId, spot, user.uid, following, stamp]);
 
   const toggleFollow = () => {
     const next = !following;
@@ -79,7 +132,6 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
     t.id !== "menu"    || spot.menu?.length > 0 ||
     t.id !== "gallery" || spot.gallery?.length > 0 ||
     t.id !== "events"  || spot.events?.length > 0 ||
-    t.id !== "updates" || spot.posts?.length > 0 ||
     t.id === "overview"
   );
 
@@ -137,7 +189,7 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
             {spot.rating && (
               <StatPill icon={<Star size={11} color="#D68A0C" fill="#D68A0C" />} value={spot.rating} color="#D68A0C" bg="#FFF7ED" />
             )}
-            <StatPill icon={<Heart size={11} color={following ? bg : C.muted} fill={following ? bg : "none"} />} value={following ? `Du & ${(spot.followers || 0) - 1} weitere` : `${(spot.followers || 0).toLocaleString("de")} Follower`} color={following ? bg : C.muted} bg={following ? `${bg}12` : C.bg} />
+            <StatPill icon={<Heart size={11} color={following ? bg : C.muted} fill={following ? bg : "none"} />} value={following ? `Du & ${Math.max(0, (spot.followers || 0) - 1)} weitere` : `${(spot.followers || 0).toLocaleString("de")} Gäste`} color={following ? bg : C.muted} bg={following ? `${bg}12` : C.bg} />
             <StatPill icon={<QrCode size={11} color={C.green} />} value={`${spot.total_checkins} Check-ins`} color={C.green} bg={C.mintLight} />
           </div>
 
@@ -161,7 +213,7 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
           >
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: stamp.reward_ready ? C.orange : bg, marginBottom: 5 }}>
-                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Punkte`}
+                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Stempel`}
               </div>
               <div style={{ height: 4, background: `${bg}18`, borderRadius: 99, overflow: "hidden" }}>
                 <div style={{ height: 4, width: `${Math.round((stamp.points / stamp.max_points) * 100)}%`, background: stamp.reward_ready ? C.orange : bg, borderRadius: 99, transition: "width 1s ease" }} />
@@ -202,11 +254,21 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
 
-            {tab === "overview" && <OverviewTab spot={spot} stamp={stamp} bg={bg} />}
+            {tab === "overview" && (
+              <OverviewTab
+                spot={spot}
+                stamp={stamp}
+                bg={bg}
+                coupons={spotCoupons}
+                couponsLoading={couponsLoading}
+                following={following}
+                onOpenCoupon={setCouponItem}
+                onFollowHint={toggleFollow}
+              />
+            )}
             {tab === "menu"     && <MenuTab     spot={spot} bg={bg} />}
             {tab === "gallery"  && <GalleryTab  spot={spot} bg={bg} />}
             {tab === "events"   && <EventsTab   spot={spot} bg={bg} />}
-            {tab === "updates"  && <UpdatesTab  spot={spot} bg={bg} />}
 
           </motion.div>
         </AnimatePresence>
@@ -229,14 +291,41 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
           <RedeemSheet spot={spot} stamp={stamp} redeemed={redeemed} onRedeem={handleRedeem} onClose={() => setShowRedeemSheet(false)} />
         )}
       </AnimatePresence>
+
+      <CouponRevealSheet
+        item={couponItem}
+        open={Boolean(couponItem)}
+        onClose={() => setCouponItem(null)}
+      />
     </div>
   );
 }
 
 // ── Overview Tab ─────────────────────────────────────────────────────────────
-function OverviewTab({ spot, stamp, bg }) {
+function OverviewTab({
+  spot,
+  stamp,
+  bg,
+  coupons = [],
+  couponsLoading = false,
+  following = false,
+  onOpenCoupon,
+  onFollowHint,
+}) {
   return (
     <div style={{ padding: "16px 16px 0" }}>
+
+      <FollowVsCollectCard compact />
+
+      <SpotCampaignCoupons
+        coupons={coupons}
+        loading={couponsLoading}
+        following={following}
+        hasStamp={Boolean(stamp)}
+        spotBg={bg}
+        onOpenCoupon={onOpenCoupon}
+        onFollowHint={onFollowHint}
+      />
 
       {/* Description */}
       {spot.description && (
@@ -280,7 +369,7 @@ function OverviewTab({ spot, stamp, bg }) {
                 <>
                   <div style={{ fontSize: 12, fontWeight: 700, color: C.dark, marginBottom: 3 }}>Nächster Reward:</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: bg }}>{stamp.reward_text || spot.reward_text}</div>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Punkte</div>
+                  <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Stempel</div>
                 </>
               )}
             </div>
@@ -355,7 +444,7 @@ function OverviewTab({ spot, stamp, bg }) {
             { icon: "✅", text: "Identität geprüft" },
             { icon: "🔒", text: "DSGVO-konform" },
             { icon: "🔄", text: "Rotating QR" },
-            { icon: "⚡", text: "Echtzeit-Punkte" },
+            { icon: "⚡", text: "Stempel live" },
           ].map(t => (
             <div key={t.text} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.7)", borderRadius: 99, padding: "4px 10px" }}>
               <span style={{ fontSize: 11 }}>{t.icon}</span>
@@ -579,63 +668,6 @@ function EventsTab({ spot, bg }) {
                 >
                   {isRsvpd ? <><CheckCircle size={14} /> Angemeldet!</> : <><CalendarDays size={14} /> Teilnehmen</>}
                 </motion.button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── Updates Tab ───────────────────────────────────────────────────────────────
-function UpdatesTab({ spot, bg }) {
-  const [liked, setLiked] = useState(new Set());
-
-  if (!spot.posts?.length) return (
-    <div style={{ padding: "40px 16px", textAlign: "center" }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>📢</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, marginBottom: 6 }}>Noch keine Updates</div>
-      <div style={{ fontSize: 13, color: C.muted }}>Folge dem Spot um die neuesten News zu sehen.</div>
-    </div>
-  );
-
-  const typeStyles = {
-    new:       { color: C.green,  bg: C.mintLight,  icon: "🆕", label: "NEU" },
-    campaign:  { color: C.orange, bg: `${C.orange}12`, icon: "⚡", label: "AKTION" },
-    milestone: { color: "#8B5CF6", bg: "#F3F0FF",  icon: "🏆", label: "MEILENSTEIN" },
-    default:   { color: C.muted,  bg: C.bg,         icon: "📌", label: "UPDATE" },
-  };
-
-  return (
-    <div style={{ padding: "14px 16px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {spot.posts.map(post => {
-          const s = typeStyles[post.type] || typeStyles.default;
-          const isLiked = liked.has(post.id);
-          return (
-            <div key={post.id} style={{ background: C.white, borderRadius: 20, border: `1px solid ${C.border}`, padding: "16px", boxShadow: `0 2px 12px rgba(6,13,8,.06)` }}>
-              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
-                  {post.emoji}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                    <span style={{ background: s.bg, color: s.color, borderRadius: 99, padding: "2px 8px", fontSize: 9, fontWeight: 800, letterSpacing: 0.5 }}>{s.label}</span>
-                    <span style={{ fontSize: 11, color: C.muted }}>{post.time}</span>
-                  </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: C.dark, marginBottom: 4 }}>{post.title}</div>
-                  <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{post.text}</div>
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 8, paddingTop: 10, borderTop: `1px solid ${C.border}` }}>
-                <button
-                  onClick={() => setLiked(s => { const n = new Set(s); n.has(post.id) ? n.delete(post.id) : n.add(post.id); return n; })}
-                  style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, color: isLiked ? C.orange : C.muted, padding: "4px 0" }}
-                >
-                  <ThumbsUp size={13} fill={isLiked ? C.orange : "none"} color={isLiked ? C.orange : C.muted} />
-                  {post.reactions + (isLiked ? 1 : 0)}
-                </button>
               </div>
             </div>
           );
