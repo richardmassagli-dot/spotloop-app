@@ -32,10 +32,24 @@ const CATS = [
 ];
 
 const DISCOVERY_CHIPS = [
+  {
+    id: "fast_reward",
+    label: "Fast Reward",
+    icon: "🔥",
+    filter: (s, stamps) => {
+      const st = stamps.find((x) => x.spot_id === s.id);
+      return st && !st.reward_ready && st.max_points > st.points && st.max_points - st.points === 1;
+    },
+  },
   { id: "favorites", label: "Lieblingsorte", icon: "❤️", filter: (s, stamps) => stamps.some((st) => st.spot_id === s.id) },
-  { id: "recommended", label: "Empfehlungen", icon: "⭐", filter: (s) => s.verified !== false },
-  { id: "rewards", label: "Mit Reward", icon: "🎁", filter: (s) => s.reward_text },
-  { id: "new", label: "Schöne Spots", icon: "✨", filter: (s, stamps) => !stamps.find((st) => st.spot_id === s.id) },
+  { id: "new", label: "Neu dabei", icon: "✨", filter: (s, stamps) => !stamps.find((st) => st.spot_id === s.id) },
+  {
+    id: "trending",
+    label: "Beliebt diese Woche",
+    icon: "📈",
+    filter: (s) => (s.total_checkins ?? 0) >= 8 || s.trending === true,
+  },
+  { id: "rewards", label: "Mit Reward", icon: "🎁", filter: (s) => Boolean(s.reward_text) },
 ];
 
 function createMarker(spot, isSelected, hasStamp, rewardReady) {
@@ -575,12 +589,6 @@ function TrendingCard({ spot, stamp, onPress }) {
       </div>
       <div style={{ fontSize: 12, fontWeight: 800, color: C.dark, marginBottom: 2 }}>{spot.name}</div>
       <div style={{ fontSize: 10, color: C.muted, marginBottom: 8 }}>{spot.area}</div>
-      {spot.rating && (
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 3, background: "#FFF7ED", borderRadius: 99, padding: "3px 8px" }}>
-          <Star size={9} color="#D68A0C" fill="#D68A0C" />
-          <span style={{ fontSize: 10, fontWeight: 800, color: "#D68A0C" }}>{spot.rating}</span>
-        </div>
-      )}
       {rewardReady && (
         <div style={{ marginTop: 6, fontSize: 10, fontWeight: 800, color: C.orange }}>🎁 Bereit!</div>
       )}
@@ -611,19 +619,13 @@ function SpotListRow({ spot, stamp, onPress }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 3 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{spot.name}</div>
-          {spot.rating && (
-            <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0, marginLeft: 6 }}>
-              <Star size={10} color="#D68A0C" fill="#D68A0C" />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#D68A0C" }}>{spot.rating}</span>
-            </div>
-          )}
         </div>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 7 }}>
           {spot.category}{spot.area && ` · ${spot.area}`}
           {spot._distanceKm != null && ` · ${formatDistanceKm(spot._distanceKm)}`}
           {openLabel && (
             <span style={{ marginLeft: 6, fontWeight: 700, color: openLabel === "Geöffnet" ? C.green : C.muted }}>
-              · {openLabel}
+              · {openLabel === "Geöffnet" ? "Heute geöffnet" : "Heute geschlossen"}
             </span>
           )}
         </div>
@@ -633,7 +635,13 @@ function SpotListRow({ spot, stamp, onPress }) {
               <div style={{ height: 3, width: `${pct}%`, background: rewardReady ? C.orange : bg, borderRadius: 99 }} />
             </div>
             <div style={{ fontSize: 10, color: rewardReady ? C.orange : C.muted, fontWeight: rewardReady ? 800 : 600 }}>
-              {rewardReady ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
+              {rewardReady
+                ? "🎁 Reward freigeschaltet"
+                : (() => {
+                    const left = stamp.max_points - stamp.points;
+                    const w = left === 1 ? "Besuch" : "Besuche";
+                    return `Noch ${left} ${w} bis ${stamp.reward_text || spot.reward_text || "Reward"}`;
+                  })()}
             </div>
           </div>
         ) : (

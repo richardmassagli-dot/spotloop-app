@@ -3,17 +3,18 @@ import { MapPin, Compass } from "lucide-react";
 import { C, Spinner } from "../ui";
 import SectionHeader from "./SectionHeader";
 import { SpotListTile } from "../tiles/SpotTiles";
-import { formatDistanceKm } from "../../lib/nearbySpots";
+import { buildSpotRewardMeta } from "../../lib/guestRewardCopy";
 
 function NearbySpotRow({ spot, stamp, socialHint, onPress, onAdd, index }) {
-  const dist = formatDistanceKm(spot._distanceKm);
-  const extraParts = [dist, socialHint?.friends > 0 ? socialHint.label : null, spot.area].filter(Boolean);
+  const meta = buildSpotRewardMeta(spot, stamp);
+  const social = socialHint?.friends > 0 ? socialHint.label : null;
+  const extraLine = [meta, social].filter(Boolean).join(" · ");
 
   return (
     <SpotListTile
       spot={spot}
       stamp={stamp}
-      extraLine={extraParts.join(" · ")}
+      extraLine={extraLine}
       onPress={onPress}
       index={index}
       action={

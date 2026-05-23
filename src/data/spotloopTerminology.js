@@ -5,9 +5,9 @@
 
 /** Member / Gast-App */
 export const GUEST = {
-  loyaltyCard: "Treue-Karte",
-  loyaltyCards: "Treue-Karten",
-  activeLoyaltyCards: "Aktive Treue-Karten",
+  loyaltyCard: "Spot-Karte",
+  loyaltyCards: "Deine Spot-Karten",
+  activeLoyaltyCards: "Deine Spot-Karten",
   collectVisits: "Besuche sammeln",
   cardFull: "Reward erreicht",
   visit: "Besuch",
@@ -16,7 +16,7 @@ export const GUEST = {
   visitSaving: "Besuch wird gespeichert…",
   visitsUntilReward: (n, reward) => `Noch ${n} Besuche bis: ${reward}`,
   visitsLeft: (n) => `Noch ${n} Besuche`,
-  noLoyaltyCards: "Noch keine Treue-Karten",
+  noLoyaltyCards: "Noch keine Spot-Karten",
   myLoyaltyCard: "Meine Treue-Karte",
   yourLoyaltyCard: "Deine Treue-Karte",
   scanForCard: "Scan für deine Treue-Karte",

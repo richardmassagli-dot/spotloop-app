@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layers, ChevronUp } from "lucide-react";
 import { C } from "../ui";
+import { GUEST } from "../../data/spotloopTerminology";
 import StampCard from "./StampCard";
 
 const STACK_OFFSET = 36;
@@ -17,7 +18,7 @@ export default function StackedStampCards({
   onRedeem,
   redeeming,
   showCta = true,
-  emptyMessage = "Noch keine Treue-Karten",
+  emptyMessage = GUEST.noLoyaltyCards,
 }) {
   const [expanded, setExpanded] = useState(false);
   const sorted = [...stamps].sort((a, b) => {
@@ -123,7 +124,7 @@ export default function StackedStampCards({
       >
         <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 700, color: C.dark }}>
           <Layers size={16} color={C.teal} />
-          {count} Treue-Karten
+          {count} Spot-Karten
         </span>
         <span style={{ fontSize: 11, fontWeight: 600, color: C.muted }}>Tippen zum Aufklappen</span>
       </button>

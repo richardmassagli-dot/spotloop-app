@@ -101,11 +101,17 @@ function FullStampCard({
 
   return (
     <div style={style}>
+      <motion.div
+        animate={rewardReady ? { scale: [1, 1.02, 1] } : { scale: 1 }}
+        transition={rewardReady ? { duration: 1.6, repeat: Infinity, ease: "easeInOut" } : undefined}
+      >
       <BankCardShell gradient={stampCardGradient(bg)} glow={glow}>
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {rewardReady && (
-              <div
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 style={{
                   background: "rgba(255,255,255,.95)",
                   color: C.orange,
@@ -119,8 +125,8 @@ function FullStampCard({
                 }}
               >
                 <Gift size={10} />
-                BEREIT
-              </div>
+                Reward freigeschaltet
+              </motion.div>
             )}
             <BankCardContactless />
           </div>
@@ -135,7 +141,7 @@ function FullStampCard({
               letterSpacing: 2,
             }}
           >
-            STEMPELKARTE
+            SPOT-KARTE
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
             <span style={{ fontSize: 28, lineHeight: 1 }}>{emoji}</span>
@@ -174,7 +180,7 @@ function FullStampCard({
               fontWeight: 600,
             }}
           >
-            {rewardReady ? "Reward erreicht" : `Noch ${left} Besuche`}
+            {rewardReady ? "Jetzt einlösen" : `Noch ${left} ${left === 1 ? "Besuch" : "Besuche"}`}
           </div>
         </div>
 
@@ -205,6 +211,7 @@ function FullStampCard({
           </div>
         </div>
       </BankCardShell>
+      </motion.div>
 
       {showCta && (
         <motion.button
@@ -274,7 +281,7 @@ function CompactStampCard({
         <span style={{ fontSize: 22 }}>{emoji}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,.5)", letterSpacing: 1.5 }}>
-            STEMPELKARTE
+            SPOT-KARTE
           </div>
           <div
             style={{

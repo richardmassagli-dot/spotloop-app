@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { ScanLine } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getUserStamps, redeemStamp } from "../../lib/firestore";
+import { motion } from "framer-motion";
 import { C, Spinner } from "../../components/ui";
 import StackedStampCards from "../../components/stamp/StackedStampCards";
+import { GUEST } from "../../data/spotloopTerminology";
 import { incrementRedeemedCount } from "../../lib/guestStats";
 
 export default function GuestWalletSimple({ onSpotClick, onScan }) {
@@ -38,16 +40,41 @@ export default function GuestWalletSimple({ onSpotClick, onScan }) {
     }
   };
 
+  const readyStamps = stamps.filter((s) => s.reward_ready);
+
   return (
     <div style={{ background: C.bg, minHeight: "100%", paddingBottom: 100 }}>
       <div style={{ padding: "52px 20px 16px" }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>WALLET</div>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: C.dark, letterSpacing: -0.6 }}>
-          Deine Treue-Karten
+          {GUEST.loyaltyCards}
         </h1>
+        <p style={{ margin: "8px 0 0", fontSize: 14, color: C.muted, lineHeight: 1.45 }}>
+          Scannen · Sammeln · Reward einlösen
+        </p>
       </div>
 
       <div style={{ padding: "0 18px" }}>
+        {readyStamps.length > 0 && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              marginBottom: 16,
+              padding: "14px 16px",
+              borderRadius: 16,
+              background: `linear-gradient(135deg, ${C.orange}16, #FFF7ED)`,
+              border: `1.5px solid ${C.orange}40`,
+            }}
+          >
+            <div style={{ fontSize: 15, fontWeight: 900, color: C.dark }}>
+              🎁 {readyStamps.length === 1 ? "Reward freigeschaltet" : `${readyStamps.length} Rewards freigeschaltet`}
+            </div>
+            <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+              Tippe unten auf „Reward einlösen“ — am Tresen vorzeigen.
+            </div>
+          </motion.div>
+        )}
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: 48 }}>
             <Spinner size={36} />
@@ -68,7 +95,7 @@ export default function GuestWalletSimple({ onSpotClick, onScan }) {
               Scan deinen ersten Spot
             </div>
             <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.55, marginBottom: 20 }}>
-              Halte den QR-Code an der Theke ins Feld — deine Treue-Karte landet automatisch hier.
+              Halte den QR-Code an der Theke ins Feld — deine Spot-Karte landet automatisch hier.
             </p>
             {onScan && (
               <button

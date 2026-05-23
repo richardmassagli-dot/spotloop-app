@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
-import { MapPin, Clock } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getUserStamps, getAllSpots } from "../../lib/firestore";
 import { C, Spinner } from "../../components/ui";
@@ -8,9 +6,11 @@ import HomeHero from "../../components/guest/HomeHero";
 import HomeNearbySection from "../../components/guest/HomeNearbySection";
 import SectionHeader from "../../components/guest/SectionHeader";
 import StackedStampCards from "../../components/stamp/StackedStampCards";
+import { GUEST } from "../../data/spotloopTerminology";
 import { mergeSpots } from "../../lib/demoData";
 import { resolveUserPosition, sortSpotsByDistance, DEFAULT_MAP_CENTER } from "../../lib/nearbySpots";
 import { getLastVisitStamp, formatVisitLabel } from "../../lib/guestStats";
+import { buildNextRewardMessage } from "../../lib/guestRewardCopy";
 
 const NEARBY_LIMIT = 3;
 const STAMP_PREVIEW_LIMIT = 3;
@@ -63,10 +63,12 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
     if (ready) return { type: "ready", stamp: ready };
     const closest = [...stamps]
       .filter((s) => !s.reward_ready && s.max_points > s.points)
-      .sort((a, b) => (a.max_points - a.points) - (b.max_points - b.points))[0];
+      .sort((a, b) => a.max_points - a.points - (b.max_points - b.points))[0];
     if (closest) return { type: "progress", stamp: closest };
     return null;
   }, [stamps]);
+
+  const rewardCopy = nextReward ? buildNextRewardMessage(nextReward.stamp, nextReward.type) : null;
 
   const lastVisit = useMemo(() => getLastVisitStamp(stamps), [stamps]);
 
@@ -85,41 +87,13 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
         profileName={profile?.name}
         bellCount={readyCount}
         onMySpots={onWallet}
+        rewardHeadline={rewardCopy?.headline}
+        rewardSubline={rewardCopy?.subline}
+        rewardReady={nextReward?.type === "ready"}
+        onRewardTap={nextReward ? () => onSpotClick?.(nextReward.stamp.spot_id) : undefined}
       />
 
       <div style={{ padding: "0 18px" }}>
-        {nextReward && (
-          <motion.button
-            type="button"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={() => onSpotClick?.(nextReward.stamp.spot_id)}
-            style={{
-              width: "100%",
-              marginTop: 4,
-              padding: "16px 18px",
-              borderRadius: 18,
-              border: `1.5px solid ${nextReward.type === "ready" ? C.orange : C.blue}40`,
-              background: nextReward.type === "ready" ? `${C.orange}14` : `${C.blue}10`,
-              cursor: "pointer",
-              textAlign: "left",
-              fontFamily: "inherit",
-            }}
-          >
-            <div style={{ fontSize: 11, fontWeight: 800, color: nextReward.type === "ready" ? C.orange : C.blue, letterSpacing: 1, marginBottom: 6 }}>
-              {nextReward.type === "ready" ? "NÄCHSTER REWARD" : "FAST DA"}
-            </div>
-            <div style={{ fontSize: 16, fontWeight: 900, color: C.dark }}>
-              {nextReward.stamp.spot?.name || "Spot"}
-            </div>
-            <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>
-              {nextReward.type === "ready"
-                ? `🎁 ${nextReward.stamp.reward_text || nextReward.stamp.spot?.reward_text || "Reward erreicht"}`
-                : `${nextReward.stamp.points}/${nextReward.stamp.max_points} Besuche · ${nextReward.stamp.spot?.reward_text || nextReward.stamp.reward_text || "Reward"}`}
-            </div>
-          </motion.button>
-        )}
-
         {loading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: 48 }}>
             <Spinner size={32} />
@@ -127,46 +101,14 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
         ) : (
           <>
             {previewStamps.length > 0 && (
-              <section style={{ marginTop: 22 }}>
+              <section style={{ marginTop: 8 }}>
                 <SectionHeader
-                  label="Aktive Treue-Karten"
+                  label={GUEST.activeLoyaltyCards}
                   count={stamps.length > STAMP_PREVIEW_LIMIT ? `${STAMP_PREVIEW_LIMIT} von ${stamps.length}` : undefined}
                   actionLabel={stamps.length > STAMP_PREVIEW_LIMIT ? "Alle" : undefined}
                   onAction={stamps.length > STAMP_PREVIEW_LIMIT ? onWallet : undefined}
                 />
                 <StackedStampCards stamps={previewStamps} onSpotClick={onSpotClick} showCta />
-              </section>
-            )}
-
-            {lastVisit && (
-              <section style={{ marginTop: 20 }}>
-                <SectionHeader label="Letzter Besuch" icon={Clock} />
-                <button
-                  type="button"
-                  onClick={() => onSpotClick?.(lastVisit.spot_id)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "14px 16px",
-                    borderRadius: 16,
-                    border: `1px solid ${C.border}`,
-                    background: C.white,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  <span style={{ fontSize: 28 }}>{lastVisit.spot?.emoji || "📍"}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>{lastVisit.spot?.name || "Spot"}</div>
-                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
-                      {formatVisitLabel(lastVisit.updated_at || lastVisit.last_visit)} · {lastVisit.points}/{lastVisit.max_points} Besuche
-                    </div>
-                  </div>
-                  <MapPin size={16} color={C.muted} />
-                </button>
               </section>
             )}
 
@@ -178,6 +120,52 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
               onCheckin={onCheckin}
               onDiscover={onDiscover}
             />
+
+            {lastVisit && (
+              <button
+                type="button"
+                onClick={() => onSpotClick?.(lastVisit.spot_id)}
+                style={{
+                  width: "100%",
+                  marginTop: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 12px",
+                  borderRadius: 12,
+                  border: `1px solid ${C.border}`,
+                  background: "transparent",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontFamily: "inherit",
+                  opacity: 0.85,
+                }}
+              >
+                <span style={{ fontSize: 18, lineHeight: 1 }}>{lastVisit.spot?.emoji || "📍"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.muted }}>
+                    Zuletzt · {formatVisitLabel(lastVisit.updated_at || lastVisit.last_visit)}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: C.dark,
+                      marginTop: 2,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {lastVisit.spot?.name || "Spot"}
+                    <span style={{ color: C.muted, fontWeight: 500 }}>
+                      {" "}
+                      · {lastVisit.points}/{lastVisit.max_points}
+                    </span>
+                  </div>
+                </div>
+              </button>
+            )}
 
             {stamps.length === 0 && <EmptyWalletState onDiscover={onDiscover} />}
           </>
@@ -202,7 +190,7 @@ function EmptyWalletState({ onDiscover }) {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📱</div>
       <div style={{ fontSize: 16, fontWeight: 900, color: C.dark, marginBottom: 8 }}>Scan deinen ersten Spot</div>
       <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.55, marginBottom: 16 }}>
-        Tippe unten auf Scannen — Besuche landen automatisch in deiner Wallet.
+        Scannen → Sammeln → Reward — dein Lieblingsort wartet.
       </p>
       {onDiscover && (
         <button

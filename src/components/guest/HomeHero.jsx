@@ -10,15 +10,26 @@ function initials(name) {
 }
 
 /**
- * Premium-Begrüßungsbereich für die Gäste-Startseite.
+ * Begrüßung + optionaler Reward-Hook („Was lohnt sich heute?“).
  */
-export default function HomeHero({ greeting, firstName, dateStr, profileName, bellCount, onMySpots }) {
+export default function HomeHero({
+  greeting,
+  firstName,
+  dateStr,
+  profileName,
+  bellCount,
+  onMySpots,
+  rewardHeadline,
+  rewardSubline,
+  rewardReady = false,
+  onRewardTap,
+}) {
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
-        padding: "52px 20px 28px",
+        padding: "52px 20px 24px",
         background: `linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 72%, ${C.bg} 100%)`,
       }}
     >
@@ -59,7 +70,7 @@ export default function HomeHero({ greeting, firstName, dateStr, profileName, be
           </span>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14 }}>
           <div style={{ display: "flex", gap: 14, alignItems: "center", flex: 1, minWidth: 0 }}>
             <div
               style={{
@@ -101,8 +112,61 @@ export default function HomeHero({ greeting, firstName, dateStr, profileName, be
 
           {onMySpots && <NotificationBellButton count={bellCount} onClick={onMySpots} minimal />}
         </div>
-      </motion.div>
 
+        {rewardHeadline && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08, duration: 0.4 }}
+            onClick={onRewardTap}
+            style={{
+              width: "100%",
+              marginTop: 18,
+              padding: "16px 18px",
+              borderRadius: 18,
+              border: `1.5px solid ${rewardReady ? `${C.orange}45` : `${C.blue}35`}`,
+              background: rewardReady
+                ? `linear-gradient(135deg, ${C.orange}18 0%, #FFF7ED 100%)`
+                : `linear-gradient(135deg, ${C.blue}12 0%, #FFFFFF 100%)`,
+              cursor: onRewardTap ? "pointer" : "default",
+              textAlign: "left",
+              fontFamily: "inherit",
+              boxShadow: rewardReady
+                ? `0 8px 24px ${C.orange}18`
+                : "0 8px 24px rgba(27, 79, 216, 0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                color: rewardReady ? C.orange : C.blue,
+                letterSpacing: 1.2,
+                marginBottom: 6,
+              }}
+            >
+              {rewardReady ? "DEIN NÄCHSTER SCHRITT" : "WAS SICH HEUTE LOHNT"}
+            </div>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 900,
+                color: C.dark,
+                lineHeight: 1.3,
+                letterSpacing: -0.3,
+              }}
+            >
+              {rewardHeadline}
+            </div>
+            {rewardSubline && (
+              <div style={{ fontSize: 13, color: C.muted, marginTop: 6, lineHeight: 1.45 }}>
+                {rewardSubline}
+              </div>
+            )}
+          </motion.button>
+        )}
+      </motion.div>
     </div>
   );
 }

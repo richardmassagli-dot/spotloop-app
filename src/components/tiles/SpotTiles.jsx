@@ -116,22 +116,6 @@ export function SpotListTile({ spot, stamp, onPress, index = 0, action, extraLin
             >
               {spot.name}
             </div>
-            {spot.rating && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 3,
-                  flexShrink: 0,
-                  background: C.goldLight,
-                  borderRadius: 99,
-                  padding: "3px 8px",
-                }}
-              >
-                <Star size={10} color={C.gold} fill={C.gold} />
-                <span style={{ fontSize: 10, fontWeight: 800, color: C.gold }}>{spot.rating}</span>
-              </div>
-            )}
           </div>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: extraLine ? 4 : 8 }}>
             {spot.category}
@@ -156,7 +140,13 @@ export function SpotListTile({ spot, stamp, onPress, index = 0, action, extraLin
                 />
               </div>
               <div style={{ fontSize: 10, fontWeight: rewardReady ? 800 : 600, color: rewardReady ? C.orange : C.muted }}>
-                {rewardReady ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
+                {rewardReady
+                  ? "🎁 Reward freigeschaltet"
+                  : (() => {
+                      const left = stamp.max_points - stamp.points;
+                      const w = left === 1 ? "Besuch" : "Besuche";
+                      return `Noch ${left} ${w} bis ${stamp.reward_text || spot.reward_text || "Reward"}`;
+                    })()}
               </div>
             </div>
           ) : (

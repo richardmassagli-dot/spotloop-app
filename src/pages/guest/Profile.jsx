@@ -123,7 +123,7 @@ export default function Profile({ onLogout }) {
           <div style={{ display: "flex", gap: 12 }}>
             {[
               { label: "Rewards eingelöst", val: redeemedCount },
-              { label: "Treue-Karten", val: stamps.length },
+              { label: "Spot-Karten", val: stamps.length },
             ].map((r, i) => (
               <div key={i} style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px" }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: C.dark, letterSpacing: -0.5 }}>{r.val}</div>
