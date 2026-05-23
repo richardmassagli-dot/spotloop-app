@@ -3,6 +3,7 @@ import { categoryLabelOnly } from "../../lib/spotDisplay";
 import {
   HeaderShell,
   HeaderLogoRow,
+  HeaderBrandMark,
   HeaderTitle,
   HeaderSubtitle,
   HeaderSpotAvatar,
@@ -27,10 +28,19 @@ export default function MerchantHero({
     <HeaderShell paddingBottom={showKpis ? 22 : 14} fadeToContent={hub}>
       {!hub && <HeaderLogoRow onLogout={onLogout} />}
       {hub && onLogout && (
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 8,
+            marginBottom: 10,
+          }}
+        >
           <HeaderIconButton onClick={onLogout} label="Abmelden" size={40}>
             <LogOut size={18} strokeWidth={2.25} />
           </HeaderIconButton>
+          <HeaderBrandMark size={16} />
         </div>
       )}
 

@@ -335,21 +335,28 @@ export function HeaderSegmentPills({ options, value, onChange }) {
   );
 }
 
+/** Spotloop-Lockup für den blauen Merchant-Header */
+export function HeaderBrandMark({ size = 16 }) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        background: "rgba(255,255,255,.1)",
+        border: "1px solid rgba(255,255,255,.16)",
+        borderRadius: 99,
+        padding: size >= 20 ? "6px 10px 6px 8px" : "5px 9px 5px 7px",
+      }}
+    >
+      <Logo size={size} light />
+    </div>
+  );
+}
+
 export function HeaderLogoRow({ onLogout }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          background: "rgba(255,255,255,.08)",
-          border: "1px solid rgba(255,255,255,.12)",
-          borderRadius: 99,
-          padding: "6px 10px 6px 8px",
-        }}
-      >
-        <Logo size={22} light />
-      </div>
+      <HeaderBrandMark size={22} />
       {onLogout && <HeaderLogoutButton onClick={onLogout} />}
     </div>
   );
