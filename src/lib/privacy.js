@@ -333,7 +333,7 @@ export function buildPrivacySafeRoster(guests, spotId, prefs) {
 
 /** Wallet-Prinzipien — Stempel pro Spot, keine Payment-Karte. */
 export const PAYMENT_PRINCIPLES = {
-  tagline: "Ein Scan. Ein Spot. Dein Stempel.",
+  tagline: "Ein Scan. Ein Spot. Dein Besuch.",
   noUniversalPoints:
     "Stempel und Rewards gelten nur bei dem Spot, an dem du eingecheckt hast — nicht app-weit.",
   merchantVisibility:

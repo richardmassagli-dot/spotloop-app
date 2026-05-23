@@ -7,7 +7,7 @@ export const APP_TAGLINE = PAYMENT_PRINCIPLES.tagline;
 function nextRewardLine(stamp) {
   if (!stamp) return null;
   const reward = stamp.reward_text || stamp.spot?.reward_text || "dein Reward";
-  if (stamp.reward_ready) return `Reward bereit — ${reward}`;
+  if (stamp.reward_ready) return `Reward erreicht — ${reward}`;
   const left = Math.max(0, (stamp.max_points || 10) - (stamp.points || 0));
   return `Noch ${left} bis ${reward}`;
 }

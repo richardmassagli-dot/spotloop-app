@@ -63,7 +63,7 @@ export default function MerchantQRSimple({ merchantId, spotName }) {
       </div>
 
       <p style={{ fontSize: 13, color: C.muted, marginBottom: 20, lineHeight: 1.5 }}>
-        Stell den Code gut sichtbar auf — Gäste scannen und sammeln Stempel.
+        Stell den Code gut sichtbar auf — Gäste scannen und sammeln Besuche.
       </p>
 
       <button

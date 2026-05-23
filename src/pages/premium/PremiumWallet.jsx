@@ -20,7 +20,7 @@ export default function PremiumWallet({ onSpotClick }) {
     <div className="h-full overflow-y-auto bg-[#FAFAF8]">
       <header className="px-5 pt-12 pb-2">
         <h1 className="text-2xl font-bold text-[#0B1F3A] tracking-tight">Wallet</h1>
-        <p className="text-sm text-[#5A6478] mt-0.5">Deine Stempelkarten — wie Apple Wallet</p>
+        <p className="text-sm text-[#5A6478] mt-0.5">Deine Treue-Karten — wie Apple Wallet</p>
       </header>
 
       <div className="px-5 py-4">

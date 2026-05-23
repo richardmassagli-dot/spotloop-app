@@ -43,7 +43,7 @@ export const SPOTLOOP_MARKET_TIERS = [
     name: "Starter",
     priceRange: "€49/mo",
     target: "Einzelspot — Kernfunktionen",
-    features: ["QR-Code", "Stempelkarte & Reward", "Tägliche Übersicht"],
+    features: ["QR-Code", "Treue-Karte & Reward", "Tägliche Übersicht"],
   },
   {
     id: "growth",

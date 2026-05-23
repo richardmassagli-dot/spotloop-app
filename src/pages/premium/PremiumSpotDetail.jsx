@@ -53,7 +53,7 @@ export default function PremiumSpotDetail({ spotId, onBack, onScan }) {
         </Card>
 
         <section className="mt-5">
-          <h2 className="text-[17px] font-bold text-[#0B1F3A] mb-3">Deine Stempelkarte</h2>
+          <h2 className="text-[17px] font-bold text-[#0B1F3A] mb-3">Deine Treue-Karte</h2>
           <div className="rounded-3xl p-5 text-white shadow-[0_8px_28px_rgba(11,31,58,0.12)]" style={{ background: spot.gradient }}>
             <div className="flex justify-between text-white">
               <div>
@@ -72,7 +72,7 @@ export default function PremiumSpotDetail({ spotId, onBack, onScan }) {
         </section>
 
         <div className="mt-5 space-y-2">
-          <GradientButton onClick={handleStamp}>Stempel sammeln</GradientButton>
+          <GradientButton onClick={handleStamp}>Besuche sammeln</GradientButton>
           <GradientButton variant="ghost" onClick={onScan}>
             QR-Code scannen
           </GradientButton>

@@ -458,7 +458,7 @@ function InsightsTab() {
         {[
           { label: "Ø QR-Scan Zeit", value: "4.2 Sek", good: true },
           { label: "Reward-Einlöserate", value: "89%", good: true },
-          { label: "Manuelle Stempel", value: "11%", good: false },
+          { label: "Manuelle Besuche", value: "11%", good: false },
           { label: "Auto-Zahlung Nutzung", value: "34%", good: true },
         ].map((s, i) => (
           <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: i < 3 ? `1px solid ${C.border}` : "none" }}>

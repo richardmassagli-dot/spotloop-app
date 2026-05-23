@@ -78,7 +78,7 @@ export default function SpotloopBankCard({ ownerName, activeSpotCount, cardCount
             </span>
           </div>
           <div style={{ fontSize: 17, fontWeight: 900, color: "#fff", letterSpacing: -0.3, textShadow: "0 2px 8px rgba(0,0,0,.2)" }}>
-            Deine Stempelkarten
+            Deine Treue-Karten
           </div>
           {tagline && (
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.65)", marginTop: 6, fontWeight: 600, lineHeight: 1.45 }}>
@@ -96,7 +96,7 @@ export default function SpotloopBankCard({ ownerName, activeSpotCount, cardCount
 
       <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
         <StatPill statKey="spots" value={activeSpotCount} label={activeSpotCount === 1 ? "Spot" : "Spots"} />
-        <StatPill statKey="cards" value={cardCount} label={cardCount === 1 ? "Stempelkarte" : "Stempel"} />
+        <StatPill statKey="cards" value={cardCount} label={cardCount === 1 ? "Treue-Karte" : "Besuche"} />
         <StatPill
           statKey="rewards"
           value={readyCount}

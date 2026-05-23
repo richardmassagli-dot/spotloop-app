@@ -70,7 +70,7 @@ export default function MerchantDashboardHub({
             lineHeight: 1.45,
           }}
         >
-          QR · Stempel · Push — Gäste zurückbringen, ohne Umweg.
+          QR · Besuch · Push — Gäste zurückbringen, ohne Umweg.
         </p>
       </motion.div>
 
@@ -112,7 +112,7 @@ export default function MerchantDashboardHub({
         <MerchantHubTile
           icon={Gift}
           label="Reward"
-          hint="Stempelkarte"
+          hint="Treue-Karte"
           accent={ACCENTS.orange}
           onClick={() => onSelectTab("reward")}
           index={tileIndex++}

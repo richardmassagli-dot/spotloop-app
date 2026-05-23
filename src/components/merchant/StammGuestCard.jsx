@@ -137,7 +137,7 @@ export default function StammGuestCard({
 
         {!showBonus ? (
           <Btn onClick={() => setShowBonus(true)} variant="dark" style={{ width: "100%" }} disabled={busyCoupon || busyBonus}>
-            <Gift size={14} /> Bonus-Stempel vergeben
+            <Gift size={14} /> Bonus-Besuch bestätigen
           </Btn>
         ) : (
           <div style={{ padding: 12, background: "#FFFBEB", borderRadius: 12, border: `1px solid ${C.gold}35` }}>

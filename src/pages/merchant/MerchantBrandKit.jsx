@@ -52,7 +52,7 @@ const TEMPLATES = [
 const BRAND_MESSAGES = [
   "Hier Punkte sammeln mit spotloop!",
   "Scan & Punkte sammeln",
-  "Deine Stempelkarte – digital",
+  "Deine Treue-Karte – digital",
   "Jetzt mit spotloop sammeln",
   "Treuepunkte – ganz einfach",
 ];

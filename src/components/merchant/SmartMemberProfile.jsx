@@ -139,8 +139,8 @@ export default function SmartMemberProfile({
 
       {stamp && (
         <div style={{ padding: "10px 16px 12px", fontSize: 10, color: C.muted, borderTop: `1px solid ${C.border}` }}>
-          Stempelkarte: {profile.points}/{profile.maxPoints}
-          {profile.rewardReady ? " · Reward bereit" : ""}
+          Treue-Karte: {profile.points}/{profile.maxPoints}
+          {profile.rewardReady ? " · Reward erreicht" : ""}
         </div>
       )}
     </div>

@@ -110,7 +110,7 @@ export default function PrivacySettings({ onBack }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
               PAYMENT_PRINCIPLES.merchantVisibility,
-              "Keine universellen Punkte — nur Stempel pro Spot",
+              "Keine universellen Punkte — nur Besuche pro Spot",
               "Spots können dich nur kontaktieren, wenn du zustimmst",
               "Du kannst deine Daten jederzeit löschen oder exportieren",
             ].map((t, i) => (
@@ -127,7 +127,7 @@ export default function PrivacySettings({ onBack }) {
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<Bell size={18} />} label="Reward-Erinnerungen" sub="Wenn ein Reward einlösbar ist" value={prefs.push_rewards} onChange={set("push_rewards")} iconColor={C.fresh} /></div>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Kampagnen & Angebote" sub="Nur Spots mit deiner Stempelkarte (nach Scan)" value={prefs.push_campaigns} onChange={set("push_campaigns")} iconColor={C.gold} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Kampagnen & Angebote" sub="Nur Spots mit deiner Treue-Karte (nach Scan)" value={prefs.push_campaigns} onChange={set("push_campaigns")} iconColor={C.gold} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<MessageSquare size={18} />} label="Reaktivierungs-Einladungen" sub="Max. 1× pro Monat pro Spot — persönlich, kein Spam" value={prefs.push_reactivation !== false} onChange={(v) => set("push_reactivation")(v)} iconColor={C.blue} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<MapPin size={18} />} label="Lieblingsspot in der Nähe" sub="Wenn ein Favorit nahe ist" value={prefs.push_nearby} onChange={set("push_nearby")} iconColor={C.teal} /></div>
             <PermissionRow icon={<AlertTriangle size={18} />} label="Ablauf-Warnungen" sub="Bevor Punkte oder Rewards verfallen" value={prefs.push_expiry} onChange={set("push_expiry")} iconColor={C.orange} />
@@ -151,7 +151,7 @@ export default function PrivacySettings({ onBack }) {
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<MessageSquare size={18} />} label="Kampagnen von allen Spots" sub="Deaktiviert für mehr Kontrolle empfohlen" value={prefs.campaigns_all} onChange={set("campaigns_all")} iconColor={C.orange} /></div>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Check size={18} />} label="Folgen ohne Stempel" sub="Interesse speichern — keine Kampagnen bis zum ersten Scan" value={prefs.campaigns_opted} onChange={set("campaigns_opted")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Check size={18} />} label="Folgen ohne Treue-Karte" sub="Interesse speichern — keine Kampagnen bis zum ersten Scan" value={prefs.campaigns_opted} onChange={set("campaigns_opted")} iconColor={C.fresh} /></div>
             <PermissionRow icon={<Users size={18} />} label="Personalisierte Empfehlungen" sub="Relevante Spots basierend auf deiner Aktivität" value={prefs.discovery_personal} onChange={set("discovery_personal")} iconColor={C.purple || "#8B5CF6"} />
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function PrivacySettings({ onBack }) {
         <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 8, paddingLeft: 4 }}>TREUE & SPOT-SICHTBARKEIT</div>
         <div style={SECTION_STYLE}>
           <div style={{ padding: "0 16px" }}>
-            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Loyalitäts-Teilnahme" sub="Stempel pro Spot — keine app-weiten Punkte" value={prefs.loyalty_active} onChange={set("loyalty_active")} iconColor={C.fresh} /></div>
+            <div style={{ ...DIVIDER }}><PermissionRow icon={<Zap size={18} />} label="Loyalitäts-Teilnahme" sub="Besuche pro Spot — keine app-weiten Punkte" value={prefs.loyalty_active} onChange={set("loyalty_active")} iconColor={C.fresh} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<Eye size={18} />} label="Smart Member Profile" sub="Spots sehen Besuche, Stufe & Rewards — als Pseudonym" value={prefs.share_loyalty_insights} onChange={set("share_loyalty_insights")} iconColor={C.blue} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<Lock size={18} />} label="Ausgaben für Spots teilen" sub="Ø Besuchswert in Insights (keine Zahlungsdaten)" value={prefs.share_spend_with_spots} onChange={set("share_spend_with_spots")} iconColor={C.orange} /></div>
             <div style={{ ...DIVIDER }}><PermissionRow icon={<Gift size={18} />} label="Personalisierte Kampagnen" sub="Geburtstag & Reaktivierung nur mit Zustimmung" value={prefs.allow_personalized_campaigns} onChange={set("allow_personalized_campaigns")} iconColor={C.gold} /></div>
@@ -340,7 +340,7 @@ export default function PrivacySettings({ onBack }) {
                 <div style={{ fontSize: 40, marginBottom: 12 }}>⚠️</div>
                 <div style={{ fontSize: 18, fontWeight: 800, color: C.dark, marginBottom: 8 }}>Konto wirklich löschen?</div>
                 <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 16 }}>
-                  Alle deine Daten, Stempelkarten und Rewards werden dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
+                  Alle deine Daten, Treue-Karten und Rewards werden dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
                 </div>
                 <PrivacyNote variant="warning">Alle gesammelten Punkte und Rewards gehen verloren.</PrivacyNote>
                 <div style={{ height: 16 }} />

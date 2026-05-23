@@ -35,7 +35,7 @@ import {
 const MERCHANT_NAV = [
   { id: "overview", icon: LayoutDashboard, label: "Übersicht", hint: "3 Zahlen" },
   { id: "qr", icon: QrCode, label: "QR-Code", hint: "Anzeigen" },
-  { id: "reward", icon: Gift, label: "Reward", hint: "Stempelkarte" },
+  { id: "reward", icon: Gift, label: "Reward", hint: "Treue-Karte" },
   { id: "campaigns", icon: Megaphone, label: "Kampagne", hint: "Senden" },
   { id: "msettings", icon: Settings, label: "Einstellungen", hint: "Account" },
 ];

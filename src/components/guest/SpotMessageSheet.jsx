@@ -146,7 +146,7 @@ export default function SpotMessageSheet({ open, onClose, spot, guestUserId }) {
                 <MessageCircle size={32} color={C.muted} style={{ marginBottom: 8 }} />
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>Noch kein Gespräch</div>
                 <div style={{ fontSize: 12, color: C.muted, marginTop: 6, lineHeight: 1.45 }}>
-                  Frage zu Öffnungszeiten, Reservierung oder deiner Stempelkarte — der Spot antwortet dir hier.
+                  Frage zu Öffnungszeiten, Reservierung oder deiner Treue-Karte — der Spot antwortet dir hier.
                 </div>
               </div>
             ) : (

@@ -216,7 +216,7 @@ export default function MerchantOverviewSimple({
             </Card>
           ) : (
             <Card style={{ padding: 16, textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: C.muted }}>Noch keine Stammgäste — Gäste müssen zuerst stempeln.</div>
+              <div style={{ fontSize: 12, color: C.muted }}>Noch keine Stammgäste — Gäste müssen zuerst scannen.</div>
             </Card>
           )}
 

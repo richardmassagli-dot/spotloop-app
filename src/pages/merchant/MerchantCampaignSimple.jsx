@@ -113,7 +113,7 @@ export default function MerchantCampaignSimple({
       )}
       {sent && (
         <div style={{ marginBottom: 12 }}>
-          <Alert type="success">Kampagne an aktive Stempelkarten gesendet</Alert>
+          <Alert type="success">Kampagne an aktive Treue-Karten gesendet</Alert>
         </div>
       )}
       {!weekly.ok && (
@@ -165,7 +165,7 @@ export default function MerchantCampaignSimple({
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value.slice(0, 100))}
-        placeholder="Deine Nachricht an Gäste mit aktiver Stempelkarte…"
+        placeholder="Deine Nachricht an Gäste mit aktiver Treue-Karte…"
         rows={4}
         maxLength={100}
         style={{ ...fieldStyle, resize: "vertical", minHeight: 100 }}
@@ -209,7 +209,7 @@ export default function MerchantCampaignSimple({
         <span style={{ color: C.green, fontWeight: 900 }}>
           {loadingAudience ? "…" : audienceCount}
         </span>{" "}
-        aktive Stempelkarten
+        aktive Treue-Karten
       </div>
 
       <button
@@ -241,7 +241,7 @@ export default function MerchantCampaignSimple({
 
       {audienceCount === 0 && !loadingAudience && (
         <p style={{ fontSize: 12, color: C.muted, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>
-          Noch keine aktiven Stempelkarten — Gäste müssen scannen und in den letzten 30 Tagen wieder kommen.
+          Noch keine aktiven Treue-Karten — Gäste müssen scannen und in den letzten 30 Tagen wieder kommen.
           Folgen allein reicht nicht.
         </p>
       )}

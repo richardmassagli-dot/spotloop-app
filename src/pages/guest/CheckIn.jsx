@@ -172,7 +172,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected, onComplete
           transition={{ delay: 0.15 }}
         >
           <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 4, letterSpacing: -0.5 }}>
-            {stamp.reward_ready ? "Reward freigeschaltet!" : cooldownMs > 0 ? "Schon eingecheckt!" : "Stempel gesammelt!"}
+            {stamp.reward_ready ? "Reward erreicht!" : cooldownMs > 0 ? "Schon eingecheckt!" : "Besuch gezählt!"}
           </div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,.8)" }}>{spot.name}</div>
         </motion.div>
@@ -194,7 +194,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected, onComplete
             </div>
           ) : (
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.65)", marginTop: 8 }}>
-              Noch {stamp.max_points - stamp.points} Stempel bis: {spot.reward_text}
+              Noch {stamp.max_points - stamp.points} Besuche bis: {spot.reward_text}
             </div>
           )}
         </motion.div>
@@ -230,7 +230,7 @@ export default function CheckInPage({ spotId, onBack, onSpotDetected, onComplete
       )}
       <Spinner size={40} />
       <div style={{ marginTop: 16, fontSize: 14, fontWeight: 700, color: C.dark }}>{spot.name}</div>
-      <div style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{saving ? "Stempel wird gespeichert…" : "Check-in…"}</div>
+      <div style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{saving ? "Besuch wird gespeichert…" : "Check-in…"}</div>
     </div>
   );
 }

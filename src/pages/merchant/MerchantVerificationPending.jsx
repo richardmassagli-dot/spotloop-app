@@ -49,7 +49,7 @@ export default function MerchantVerificationPending({ spot: initialSpot, onRefre
           <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.55, textAlign: "center" }}>
             {isRejected
               ? "Dein Spot-Profil konnte nicht verifiziert werden. Bitte kontaktiere uns oder registriere dich mit korrekten Betriebsdaten neu."
-              : "Damit Follower deinen Spot finden und Stempel sammeln können, prüfen wir kurz, dass du ein echter lokaler Betrieb bist. Das dauert in der Regel 1–2 Werktage."}
+              : "Damit Follower deinen Spot finden und Besuche sammeln können, prüfen wir kurz, dass du ein echter lokaler Betrieb bist. Das dauert in der Regel 1–2 Werktage."}
           </div>
           {spot?.verification_note ? (
             <div style={{
@@ -114,7 +114,7 @@ function PrivacyContent() {
       <div>
         <strong>Warum Verifizierung?</strong>
         <div style={{ marginTop: 4, fontWeight: 500 }}>
-          Ohne Freigabe erscheinst du nicht in der Spot-Suche, Follower können keine Stempel sammeln,
+          Ohne Freigabe erscheinst du nicht in der Spot-Suche, Follower können keine Besuche sammeln,
           und Kampagnen sind gesperrt — so schützen wir Follower vor Fake-Spots.
         </div>
       </div>

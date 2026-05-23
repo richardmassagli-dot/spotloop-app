@@ -174,7 +174,7 @@ function FullStampCard({
               fontWeight: 600,
             }}
           >
-            {rewardReady ? "Reward freigeschaltet" : `Noch ${left} Stempel`}
+            {rewardReady ? "Reward erreicht" : `Noch ${left} Besuche`}
           </div>
         </div>
 

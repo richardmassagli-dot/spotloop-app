@@ -92,7 +92,7 @@ export function buildMerchantRetentionTriggers({
 /** Format Member-Standort-Notification */
 export function formatNearbyMemberNotification({ spotName, points, maxPoints, rewardText }) {
   const remaining = Math.max(0, (maxPoints || 10) - (points || 0));
-  return `Du bist in der Nähe von ${spotName}. Noch ${remaining} Stempel bis zu deinem ${rewardText || "Reward"}.`;
+  return `Du bist in der Nähe von ${spotName}. Noch ${remaining} Besuche bis zu deinem ${rewardText || "Reward"}.`;
 }
 
 export function merchantNotificationsOnboarded(userId) {

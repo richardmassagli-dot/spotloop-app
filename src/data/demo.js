@@ -310,7 +310,7 @@ export const DEMO_SPOTS = [
     lng: 9.1795,
     total_checkins: 1840,
     followers: 312,
-    description: "Steinofen-Pizza & Antipasti — Stammgast-Loyalty mit automatischer Stempelkarte.",
+    description: "Steinofen-Pizza & Antipasti — Stammgast-Loyalty mit automatischer Treue-Karte.",
     tagline: "Steinofen · Stuttgart Mitte",
     images: [],
     tags: ["Pizza", "Italienisch", "Mitnehmen"],

@@ -6,13 +6,13 @@ import { getMemberPseudonym, buildPrivacySafeRoster } from "./privacy.js";
 export const REACTIVATION_DAY_OPTIONS = [14, 30, 60, 90];
 
 export const CAMP_TYPE_META = {
-  push: { icon: "🔔", label: "Push-Benachrichtigung", desc: "Nur aktive Stempelkarten (30 Tage)" },
+  push: { icon: "🔔", label: "Push-Benachrichtigung", desc: "Nur aktive Treue-Karten (30 Tage)" },
   feed: { icon: "📌", label: "Featured Spot", desc: "Top-Position im Entdecken" },
   segment: { icon: "🎯", label: "Zielgruppen-Kampagne", desc: "Treue Gäste ansprechen" },
   reactivation: {
     icon: "💌",
     label: "Reaktivierung",
-    desc: "Gäste, die lange nicht mehr die Stempelkarte genutzt haben",
+    desc: "Gäste, die lange nicht mehr die Treue-Karte genutzt haben",
     defaultMessage: REACTIVATION_CAMPAIGN_MESSAGE,
   },
   birthday: {

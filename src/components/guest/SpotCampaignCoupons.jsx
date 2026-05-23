@@ -77,14 +77,14 @@ export default function SpotCampaignCoupons({
         >
           <div style={{ fontSize: 28, marginBottom: 8 }}>🎟️</div>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.dark, marginBottom: 6 }}>
-            {hasStamp ? "Noch keine Vorteile von diesem Spot" : following ? "Folgen — noch keine Stempelkarte" : "Scan für deine Stempelkarte"}
+            {hasStamp ? "Noch keine Vorteile von diesem Spot" : following ? "Folgen — noch keine Treue-Karte" : "Scan für deine Treue-Karte"}
           </div>
           <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, marginBottom: engaged ? 0 : 12 }}>
             {hasStamp
               ? "Kampagnen erscheinen hier, sobald du aktiv gesammelt hast (Besuch in 30 Tagen)."
               : following
                 ? "Folgen = Interesse. Erst nach dem Scan bekommst du Kampagnen — kein Lärm vorher."
-                : "QR scannen → Stempel sammeln → dann Vorteile & Kampagnen von diesem Spot."}
+                : "QR scannen → Besuche sammeln → dann Vorteile & Kampagnen von diesem Spot."}
           </div>
           {!engaged && onFollowHint && (
             <button

@@ -70,12 +70,12 @@ export default function MerchantRewardSimple({ spotId, spot }) {
       )}
 
       <label style={{ display: "block", fontSize: 14, fontWeight: 800, color: C.dark, marginBottom: 8 }}>
-        Wie viele Stempel?
+        Wie viele Besuche?
       </label>
       <select value={stamps} onChange={(e) => setStamps(e.target.value)} style={fieldStyle}>
         {STAMP_OPTIONS.map((n) => (
           <option key={n} value={n}>
-            {n} Stempel
+            {n} Besuche
           </option>
         ))}
       </select>

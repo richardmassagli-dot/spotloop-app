@@ -20,14 +20,14 @@ export const INBOX_FILTERS = [
     label: "Alle",
     hint: "Alle relevanten Updates — Rewards und deine Lieblingsspots.",
     emptyTitle: "Noch nichts Neues",
-    emptyBody: "Folge Spots und sammle Stempel — hier landet alles, was für dich zählt.",
+    emptyBody: "Folge Spots und sammle Besuche — hier landet alles, was für dich zählt.",
   },
   {
     id: "rewards",
     label: "Rewards",
     hint: "Stempeln, Rewards, Bonus und dein Fortschritt.",
     emptyTitle: "Deine Rewards",
-    emptyBody: "Check-in bei einem Spot — jeder Stempel bringt dich deinem nächsten Reward näher.",
+    emptyBody: "Check-in bei einem Spot — jeder Besuch bringt dich deinem nächsten Reward näher.",
   },
   {
     id: "spots",
@@ -152,12 +152,12 @@ export function buildStampProgressCards(stamps = [], spotsById = {}) {
       spot_category: categoryLabelOnly(spot) || spot.category,
       update_type: "reward",
       reward_available: ready,
-      title: ready ? "Reward bereit" : `${pts} von ${max} Stempeln`,
+      title: ready ? "Reward erreicht" : `${pts} von ${max} Besuchen`,
       description: ready
         ? stamp.reward_text || spot.reward_text || "Beim Personal einlösen."
         : left === 1
-          ? "Nur noch 1 Stempel — du bist fast da."
-          : `Noch ${left} Stempel bis zu deinem Reward.`,
+          ? "Nur noch 1 Besuch — du bist fast da."
+          : `Noch ${left} Besuche bis zu deinem Reward.`,
       time_label: ready ? "Jetzt einlösen" : "Fortschritt",
       published_at: new Date().toISOString(),
       is_new: ready,

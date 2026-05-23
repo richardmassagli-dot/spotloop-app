@@ -136,7 +136,7 @@ export default function WalletScreen({ onSpotClick }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
             <div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 2, fontWeight: 700, marginBottom: 3 }}>WALLET</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: -0.8 }}>Stempel & Rewards</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: -0.8 }}>Besuche & Rewards</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginTop: 6 }}>Pro Spot — keine allgemeinen Punkte</div>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function WalletScreen({ onSpotClick }) {
           <div style={{ display: "flex", gap: 20, paddingTop: 4 }}>
             {[
               { val: stamps.length, label: "Spots", icon: "📍" },
-              { val: totalStamps, label: "Stempel", icon: "⭐" },
+              { val: totalStamps, label: "Besuche", icon: "⭐" },
               { val: readyCount, label: "Rewards", icon: "🎁", highlight: readyCount > 0 },
             ].map((s, i) => (
               <div key={i}>
@@ -469,7 +469,7 @@ function CardDetailSheet({ stamp, redeeming, redeemed, onClose, onRedeem, onSpot
             <div style={{ flex: 1 }}>
               {stamp.reward_ready ? (
                 <div>
-                  <div style={{ fontSize: 15, fontWeight: 900, color: C.orange, marginBottom: 4 }}>🎉 Reward bereit!</div>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: C.orange, marginBottom: 4 }}>🎉 Reward erreicht!</div>
                   <div style={{ fontSize: 13, color: C.dark, fontWeight: 700 }}>{stamp.reward_text}</div>
                   <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>Beim Personal einlösen.</div>
                 </div>
@@ -480,7 +480,7 @@ function CardDetailSheet({ stamp, redeeming, redeemed, onClose, onRedeem, onSpot
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: bg }}>{stamp.reward_text}</div>
                   <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
-                    Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Stempel bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong>
+                    Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Besuche bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong>
                   </div>
                 </div>
               )}
@@ -618,7 +618,7 @@ function HistorySheet({ onClose }) {
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: style.color }}>
-                    {t.points > 0 ? `+${t.points}` : t.points} Stempel
+                    {t.points > 0 ? `+${t.points}` : t.points} Besuche
                   </div>
                   <div style={{ fontSize: 10, color: C.muted }}>{t.date}</div>
                 </div>
@@ -637,7 +637,7 @@ function EmptyState({ query, filter }) {
     <div style={{ textAlign: "center", padding: "52px 20px" }}>
       <div style={{ fontSize: 52, marginBottom: 16 }}>{query ? "🔍" : filter !== "Alle" ? "📭" : "💳"}</div>
       <div style={{ fontSize: 16, fontWeight: 800, color: C.dark, marginBottom: 8 }}>
-        {query ? `Keine Karte für "${query}"` : filter !== "Alle" ? `Keine ${filter} Karten` : "Noch keine Stempelkarten"}
+        {query ? `Keine Karte für "${query}"` : filter !== "Alle" ? `Keine ${filter} Karten` : "Noch keine Treue-Karten"}
       </div>
       <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
         {query ? "Versuche einen anderen Suchbegriff." : "Scanne den QR-Code eines Spots, um deine erste Karte zu erstellen."}

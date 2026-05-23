@@ -10,7 +10,7 @@ export const REACTIVATION_COOLDOWN_DAYS = 30;
 export const STAMMGAST_INACTIVE_DAYS = 21;
 
 export const REACTIVATION_CAMPAIGN_MESSAGE =
-  "Wir vermissen dich — komm vorbei und hol dir einen Bonus-Stempel.";
+  "Wir vermissen dich — komm vorbei und hol dir einen Bonus-Besuch.";
 
 export const WEEKLY_CAMPAIGN_LIMIT_BY_PLAN = {
   pilot: 99,
@@ -26,12 +26,12 @@ export const FOLLOW_VS_COLLECT = {
   follow: {
     headline: "Folgen = Interesse",
     body:
-      "Du entdeckst einen Spot oder möchtest ihn später besuchen. Keine Stempelkarte, kein Lärm — der Spot bleibt ruhig im Hintergrund.",
+      "Du entdeckst einen Spot oder möchtest ihn später besuchen. Keine Treue-Karte, kein Lärm — der Spot bleibt ruhig im Hintergrund.",
   },
   collect: {
     headline: "Sammeln = echte Beziehung",
     body:
-      "Erst wenn du wirklich hingehest und scannst, entsteht deine Stempelkarte — und erst dann bekommst du Kampagnen dieses Spots.",
+      "Erst wenn du wirklich hingehest und scannst, entsteht deine Treue-Karte — und erst dann bekommst du Kampagnen dieses Spots.",
   },
 };
 
@@ -39,7 +39,7 @@ export const MEMBER_SPAM_PROTECTION = {
   title: "Member-Schutz vor Spam",
   rules: [
     "Jeder Spot hat ein wöchentliches Kampagnen-Limit (Growth: max. 2× pro Woche).",
-    "Kampagnen gehen nur an Gäste mit aktiver Stempelkarte — Besuch in den letzten 30 Tagen.",
+    "Kampagnen gehen nur an Gäste mit aktiver Treue-Karte — Besuch in den letzten 30 Tagen.",
     "Max. 2 Notifications pro Tag, max. 3 pro Woche — egal wie viele Spots du folgst.",
     "Standort nur in der Nähe (200 m) · Fast-volle Karte hat Vorrang · kein Spam von weit weg.",
   ],
@@ -57,7 +57,7 @@ export const REACTIVATION_RULES = {
 export const OFFLINE_QR_RULES = {
   title: "Offline QR",
   body:
-    "Scan am Tisch → Spot-Landingpage → App & erster Stempel. Kein Push vorher — der Gast entscheidet selbst.",
+    "Scan am Tisch → Spot-Landingpage → App & erster Besuch. Kein Push vorher — der Gast entscheidet selbst.",
 };
 
 export const BALANCE_SUMMARY = [

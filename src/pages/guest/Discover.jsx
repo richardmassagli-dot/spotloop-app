@@ -505,7 +505,7 @@ function MapPreviewCard({ spot, stamp, onOpen, onClose }) {
           <div style={{ background: `${bg}08`, border: `1px solid ${bg}20`, borderRadius: 12, padding: "10px 12px", marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: bg }}>
-                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Stempel`}
+                {stamp.reward_ready ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} Besuche`}
               </span>
               <span style={{ fontSize: 11, color: C.muted }}>
                 {stamp.reward_ready ? stamp.reward_text : `Noch ${stamp.max_points - stamp.points} bis: ${stamp.reward_text}`}
@@ -633,7 +633,7 @@ function SpotListRow({ spot, stamp, onPress }) {
               <div style={{ height: 3, width: `${pct}%`, background: rewardReady ? C.orange : bg, borderRadius: 99 }} />
             </div>
             <div style={{ fontSize: 10, color: rewardReady ? C.orange : C.muted, fontWeight: rewardReady ? 800 : 600 }}>
-              {rewardReady ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
+              {rewardReady ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
             </div>
           </div>
         ) : (

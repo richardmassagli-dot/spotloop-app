@@ -118,7 +118,7 @@ export function AuthHero({ chips = [], variant = "guest" }) {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Dein Stempel.
+                Dein Besuch.
               </span>
             </>
           )}

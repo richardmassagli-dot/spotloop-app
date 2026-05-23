@@ -108,9 +108,9 @@ export default function MerchantCommunity({ spotId, spot, checkins = [], campaig
         visits: guest.visitCount,
         vip_reward: rewardText,
         bonus_points: 1,
-        note: `Bonus-Stempel · ${guest.lastVisitLabel}`,
+        note: `Bonus-Besuch · ${guest.lastVisitLabel}`,
       });
-      showSuccess(`Bonus-Stempel für ${guest.pseudonym} vergeben`);
+      showSuccess(`Bonus-Besuch für ${guest.pseudonym} bestätigt`);
     } catch (e) {
       setError(e.message || "Bonus konnte nicht vergeben werden.");
     } finally {
@@ -146,7 +146,7 @@ export default function MerchantCommunity({ spotId, spot, checkins = [], campaig
         </div>
         <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.45, marginBottom: 12 }}>
           {topRegulars.total === 0
-            ? "Noch keine Daten — Gäste müssen zuerst stempeln."
+            ? "Noch keine Daten — Gäste müssen zuerst scannen."
             : STAMMGAST_TOP_PERCENT_NOTE}
         </div>
         {stammUserIds.length > 0 && (

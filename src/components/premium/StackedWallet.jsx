@@ -37,7 +37,7 @@ export default function StackedWallet({ cards, onCardClick }) {
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] font-semibold text-white/75 uppercase tracking-wide">Stempelkarte</p>
+                <p className="text-[10px] font-semibold text-white/75 uppercase tracking-wide">Treue-Karte</p>
                 <p className="text-lg font-bold mt-0.5">{spot.name}</p>
                 <p className="text-xs text-white/80">{spot.category}</p>
               </div>
@@ -52,7 +52,7 @@ export default function StackedWallet({ cards, onCardClick }) {
 
             <div className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold">
               <Gift size={14} />
-              {rewardReady ? "Reward bereit!" : `Nächster: ${nextReward}`}
+              {rewardReady ? "Reward erreicht!" : `Nächster: ${nextReward}`}
             </div>
           </motion.button>
         );

@@ -29,13 +29,13 @@ export const MEMBER_TRIGGERS = {
     title: "Standort-Trigger",
     when: `Nur innerhalb ${NOTIFICATION_LIMITS.memberLocationRadiusM} m — nie wenn der Member weit weg ist`,
     example: (spot, remaining, reward) =>
-      `Du bist in der Nähe von ${spot}. Noch ${remaining} Stempel bis zu deinem ${reward}.`,
+      `Du bist in der Nähe von ${spot}. Noch ${remaining} Besuche bis zu deinem ${reward}.`,
     priority: 100,
   },
   stamp_almost_full: {
     id: "stamp_almost_full",
     title: "Fast-voll",
-    when: "9 von 10 Stempeln (1 Besuch vor Reward)",
+    when: "9 von 10 Besuchen (1 Besuch vor Reward)",
     example: (spot, reward) =>
       `Nur noch 1 Besuch bei ${spot} — dann gehört der ${reward} dir.`,
     priority: 95,
@@ -133,5 +133,5 @@ export const MEMBER_LOCATION_ONBOARDING = {
 
 /** Vorformulierter Kampagnen-Text (Kampagnen-Erinnerung). */
 export function defaultCampaignReminderDraft(spotName = "deinem Spot") {
-  return `Hey! Bei ${spotName} gibt's diese Woche etwas Neues — komm vorbei und sammle deinen Stempel. Wir freuen uns auf dich!`;
+  return `Hey! Bei ${spotName} gibt's diese Woche etwas Neues — komm vorbei und zähl deinen Besuch. Wir freuen uns auf dich!`;
 }

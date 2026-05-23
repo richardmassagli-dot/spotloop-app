@@ -86,9 +86,9 @@ export default function MerchantStampDesign({ spotId, spot }) {
 
   return (
     <div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, marginBottom: 4 }}>Stempelkarte designen</div>
+      <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, marginBottom: 4 }}>Treue-Karte designen</div>
       <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.45 }}>
-        Farbe, Emoji, Reward und Stempelanzahl — so sehen Gäste deine Karte in Wallet & Check-in.
+        Farbe, Emoji, Reward und Besuchsanzahl — so sehen Gäste deine Karte in Wallet & Check-in.
       </div>
 
       {error && (
@@ -98,7 +98,7 @@ export default function MerchantStampDesign({ spotId, spot }) {
       )}
       {saved && (
         <div style={{ marginBottom: 12 }}>
-          <Alert type="success">Stempelkarte gespeichert ✓</Alert>
+          <Alert type="success">Treue-Karte gespeichert ✓</Alert>
         </div>
       )}
 
@@ -202,7 +202,7 @@ export default function MerchantStampDesign({ spotId, spot }) {
       </Card>
 
       <Card style={{ padding: 14, marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: C.dark, marginBottom: 10 }}>Stempel bis Reward</div>
+        <div style={{ fontSize: 13, fontWeight: 800, color: C.dark, marginBottom: 10 }}>Besuche bis Reward</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {POINT_OPTIONS.map((p) => (
             <button
@@ -233,7 +233,7 @@ export default function MerchantStampDesign({ spotId, spot }) {
         <input
           value={action}
           onChange={(e) => setAction(e.target.value.slice(0, 80))}
-          placeholder="z.B. Doppelte Stempel am Mittwoch"
+          placeholder="z.B. Doppelte Besuche am Mittwoch"
           style={{
             width: "100%",
             padding: "10px 12px",
@@ -243,11 +243,11 @@ export default function MerchantStampDesign({ spotId, spot }) {
             fontFamily: "inherit",
           }}
         />
-        <div style={{ fontSize: 10, color: C.muted, marginTop: 6 }}>Erscheint auf der Stempelkarte und in My Spots.</div>
+        <div style={{ fontSize: 10, color: C.muted, marginTop: 6 }}>Erscheint auf der Treue-Karte und in My Spots.</div>
       </Card>
 
       <Btn onClick={save} disabled={saving} variant="dark" style={{ width: "100%" }}>
-        <Save size={16} /> {saving ? "Speichern…" : "Stempelkarte speichern"}
+        <Save size={16} /> {saving ? "Speichern…" : "Treue-Karte speichern"}
       </Btn>
     </div>
   );

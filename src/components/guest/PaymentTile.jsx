@@ -104,7 +104,7 @@ export default function PaymentTile({ payment, onSpotClick, featured = false, in
           >
             <Zap size={12} color={C.fresh} strokeWidth={2.5} />
             <span style={{ fontSize: 11, fontWeight: 800, color: C.blue }}>
-              +{payment.stamps_earned} Stempel automatisch
+              +{payment.stamps_earned} Besuche automatisch
             </span>
           </div>
 

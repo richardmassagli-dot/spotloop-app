@@ -177,7 +177,7 @@ export default function MerchantSetup({ onDone }) {
               </div>
             ))}
 
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.mid, marginTop: 16, marginBottom: 8 }}>Stempel bis zum Reward</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.mid, marginTop: 16, marginBottom: 8 }}>Besuche bis zum Reward</div>
             <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
               {["5", "8", "10", "12"].map(p => (
                 <button
@@ -217,7 +217,7 @@ export default function MerchantSetup({ onDone }) {
                 ["📂 Kategorie", cat],
                 ["📍 Stadtteil", area || "–"],
                 ["🎁 Reward",    reward],
-                ["⭐ Punkte",    `${pts} Stempel`],
+                ["⭐ Besuche",    `${pts} Besuche`],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: `1px solid ${C.border}` }}>
                   <span style={{ fontSize: 12, color: C.muted }}>{k}</span>

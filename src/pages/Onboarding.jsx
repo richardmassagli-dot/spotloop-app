@@ -6,7 +6,7 @@ const SLIDES = [
   {
     emoji: "💳",
     title: "Dein Loyalty-Wallet",
-    body: "Alle Stempelkarten deiner Lieblingscafés, Restaurants und Bäckereien — an einem Ort. Übersichtlich. Immer dabei.",
+    body: "Alle Treue-Karten deiner Lieblingscafés, Restaurants und Bäckereien — an einem Ort. Übersichtlich. Immer dabei.",
     bg: "#0A1628",
     accent: "#1B4FD8",
     accentLight: "#EFF6FF",

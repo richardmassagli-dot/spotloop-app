@@ -159,7 +159,7 @@ export default function PremiumQRScanner({ onClose, onSuccess }) {
               >
                 <Check size={48} className="text-white" strokeWidth={3} />
               </motion.div>
-              <h2 className="mt-6 text-2xl font-bold text-white">Stempel gesammelt!</h2>
+              <h2 className="mt-6 text-2xl font-bold text-white">Besuch gezählt!</h2>
               <p className="text-white/70 mt-1">{result.spot?.name}</p>
               <p className="text-3xl font-black text-white mt-2">
                 {result.points}/{result.maxPoints}

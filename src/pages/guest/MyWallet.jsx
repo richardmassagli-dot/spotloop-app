@@ -63,7 +63,7 @@ export default function MyWallet({ onSpotClick, onLogout }) {
           </div>
           <div style={{ display: "flex", gap: 24 }}>
             {[
-              { val: stamps.length,       label: "Stempelkarten" },
+              { val: stamps.length,       label: "Treue-Karten" },
               { val: totalVisits,          label: "Besuche" },
               { val: readyRewards.length,  label: "Rewards" },
             ].map((s, i) => (
@@ -96,7 +96,7 @@ export default function MyWallet({ onSpotClick, onLogout }) {
 
         {/* Section header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: C.dark }}>Stempelkarten</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: C.dark }}>Treue-Karten</div>
           <div style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>{stamps.length} aktiv</div>
         </div>
 
@@ -105,9 +105,9 @@ export default function MyWallet({ onSpotClick, onLogout }) {
         ) : stamps.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 16px" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>💳</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: C.dark, marginBottom: 8 }}>Noch keine Stempelkarten</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: C.dark, marginBottom: 8 }}>Noch keine Treue-Karten</div>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
-              Scanne den QR-Code eines Spots, um deine erste Stempelkarte zu erstellen.
+              Scanne den QR-Code eines Spots, um deine erste Treue-Karte zu erstellen.
             </div>
           </div>
         ) : (

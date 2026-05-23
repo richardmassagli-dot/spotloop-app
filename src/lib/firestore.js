@@ -387,7 +387,7 @@ export const grantStammgastBonusStamp = async (userId, spotId) => {
     );
     stamp = data;
   }
-  if (!stamp) throw new Error("Bonus-Stempel konnte nicht vergeben werden.");
+  if (!stamp) throw new Error("Bonus-Besuch konnte nicht bestätigt werden.");
   const pts = stamp.points ?? 0;
   return {
     ...stamp,

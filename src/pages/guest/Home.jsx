@@ -114,8 +114,8 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
             </div>
             <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>
               {nextReward.type === "ready"
-                ? `🎁 ${nextReward.stamp.reward_text || nextReward.stamp.spot?.reward_text || "Reward bereit"}`
-                : `${nextReward.stamp.points}/${nextReward.stamp.max_points} Stempel · ${nextReward.stamp.spot?.reward_text || nextReward.stamp.reward_text || "Reward"}`}
+                ? `🎁 ${nextReward.stamp.reward_text || nextReward.stamp.spot?.reward_text || "Reward erreicht"}`
+                : `${nextReward.stamp.points}/${nextReward.stamp.max_points} Besuche · ${nextReward.stamp.spot?.reward_text || nextReward.stamp.reward_text || "Reward"}`}
             </div>
           </motion.button>
         )}
@@ -129,7 +129,7 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
             {previewStamps.length > 0 && (
               <section style={{ marginTop: 22 }}>
                 <SectionHeader
-                  label="Aktive Stempelkarten"
+                  label="Aktive Treue-Karten"
                   count={stamps.length > STAMP_PREVIEW_LIMIT ? `${STAMP_PREVIEW_LIMIT} von ${stamps.length}` : undefined}
                   actionLabel={stamps.length > STAMP_PREVIEW_LIMIT ? "Alle" : undefined}
                   onAction={stamps.length > STAMP_PREVIEW_LIMIT ? onWallet : undefined}
@@ -162,7 +162,7 @@ export default function Home({ onSpotClick, onCheckin, onDiscover, onWallet }) {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>{lastVisit.spot?.name || "Spot"}</div>
                     <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
-                      {formatVisitLabel(lastVisit.updated_at || lastVisit.last_visit)} · {lastVisit.points}/{lastVisit.max_points} Stempel
+                      {formatVisitLabel(lastVisit.updated_at || lastVisit.last_visit)} · {lastVisit.points}/{lastVisit.max_points} Besuche
                     </div>
                   </div>
                   <MapPin size={16} color={C.muted} />
@@ -202,7 +202,7 @@ function EmptyWalletState({ onDiscover }) {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📱</div>
       <div style={{ fontSize: 16, fontWeight: 900, color: C.dark, marginBottom: 8 }}>Scan deinen ersten Spot</div>
       <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.55, marginBottom: 16 }}>
-        Tippe unten auf Scannen — Stempel landen automatisch in deiner Wallet.
+        Tippe unten auf Scannen — Besuche landen automatisch in deiner Wallet.
       </p>
       {onDiscover && (
         <button

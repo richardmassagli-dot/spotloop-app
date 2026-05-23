@@ -44,7 +44,7 @@ export default function RewardsMarket({ onSpotClick }) {
       {/* ── Header ── */}
       <div style={{ background: C.white, padding: "52px 20px 16px", borderBottom: `1px solid ${C.border}` }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: C.dark, letterSpacing: -0.5, marginBottom: 4 }}>Rewards</div>
-        <div style={{ fontSize: 13, color: C.muted }}>Einlösbare Vorteile & Stempelkarten</div>
+        <div style={{ fontSize: 13, color: C.muted }}>Einlösbare Vorteile & Treue-Karten</div>
       </div>
 
       {/* ── Ready rewards banner ── */}
@@ -99,7 +99,7 @@ export default function RewardsMarket({ onSpotClick }) {
               {filter === "ready" ? "Noch kein Reward einlösbar" : "Keine aktiven Karten"}
             </div>
             <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
-              Scanne QR-Codes um Stempel zu sammeln.
+              Scanne QR-Codes um Besuche zu sammeln.
             </div>
           </div>
         ) : (
@@ -120,7 +120,7 @@ export default function RewardsMarket({ onSpotClick }) {
         {discover.length > 0 && (
           <section style={{ marginTop: 24 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: C.dark, marginBottom: 4 }}>Neue Spots entdecken</div>
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>Sammle bei diesen Spots deine erste Stempelkarte</div>
+            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>Sammle bei diesen Spots deine erste Treue-Karte</div>
             <div style={{ display: "flex", gap: 12, overflowX: "auto", margin: "0 -20px", padding: "0 20px 4px" }}>
               {discover.slice(0, 6).map(spot => (
                 <DiscoverChip key={spot.id} spot={spot} onPress={() => onSpotClick(spot.id)} />
@@ -187,7 +187,7 @@ function RewardCard({ stamp, onPress, onRedeem, redeeming }) {
           <div style={{ fontSize: 12, color: C.muted }}>
             {stamp.reward_ready
               ? <span style={{ color: C.orange, fontWeight: 700 }}>✨ {stamp.reward_text}</span>
-              : <span>{stamp.max_points - stamp.points} Stempel bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong></span>
+              : <span>{stamp.max_points - stamp.points} Besuche bis: <strong style={{ color: C.dark }}>{stamp.reward_text}</strong></span>
             }
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: C.muted }}>{pct}%</div>
@@ -227,7 +227,7 @@ function DiscoverChip({ spot, onPress }) {
     >
       <div style={{ fontSize: 28, marginBottom: 6 }}>{spot.emoji || "🏪"}</div>
       <div style={{ fontSize: 12, fontWeight: 700, color: C.dark, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{spot.name}</div>
-      <div style={{ fontSize: 10, color: C.muted }}>{spot.max_points} Stempel</div>
+      <div style={{ fontSize: 10, color: C.muted }}>{spot.max_points} Besuche</div>
     </div>
   );
 }

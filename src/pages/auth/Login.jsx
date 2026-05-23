@@ -194,7 +194,7 @@ export default function Login() {
                 { Icon: Shield, text: "Kein Algorithmus" },
               ]
             : [
-                { Icon: Star, text: "Stempel sammeln" },
+                { Icon: Star, text: "Besuche sammeln" },
                 { Icon: Gift, text: "Rewards" },
                 { Icon: MapPin, text: "Spots entdecken" },
               ]

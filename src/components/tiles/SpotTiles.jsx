@@ -156,7 +156,7 @@ export function SpotListTile({ spot, stamp, onPress, index = 0, action, extraLin
                 />
               </div>
               <div style={{ fontSize: 10, fontWeight: rewardReady ? 800 : 600, color: rewardReady ? C.orange : C.muted }}>
-                {rewardReady ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
+                {rewardReady ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} · ${stamp.reward_text}`}
               </div>
             </div>
           ) : (

@@ -3,7 +3,7 @@ import { CAMP_TYPE_META } from "./campaignAudiences";
 
 export const MESSAGE_TEMPLATES = {
   reactivation: [
-    "Wir vermissen dich! 🎁 Komm vorbei — diese Woche gibt es einen Bonus-Stempel.",
+    "Wir vermissen dich! 🎁 Komm vorbei — diese Woche gibt es einen Bonus-Besuch.",
     "Lange nicht gesehen! ☕ Dein Lieblingsplatz wartet — heute mit Extra-Reward.",
     "Hey! 👋 Zeit für einen Besuch — wir haben etwas für dich vorbereitet.",
   ],

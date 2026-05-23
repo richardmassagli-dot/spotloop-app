@@ -116,7 +116,7 @@ export const PREMIUM_REWARD_HISTORY = [
 export const PREMIUM_FEED = [
   { id: "f1", spotId: "spot-cafe-himmelblau", type: "action", text: "Happy Hour: Doppelte Punkte bis 16 Uhr", time: "Heute" },
   { id: "f2", spotId: "spot-bar-nebula", type: "new", text: "Neuer Spot in deiner Nähe — Willkommenspunkt warten", time: "Gestern" },
-  { id: "f3", spotId: "spot-trattoria-sole", type: "reward", text: "Noch 2 Stempel bis zu deinem Dessert-Reward", time: "Mo" },
+  { id: "f3", spotId: "spot-trattoria-sole", type: "reward", text: "Noch 2 Besuche bis zu deinem Dessert-Reward", time: "Mo" },
 ];
 
 export function spotById(id) {

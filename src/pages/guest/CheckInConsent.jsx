@@ -23,8 +23,8 @@ const PERMISSIONS = [
   {
     id: "loyalty",
     Icon: Star,
-    label: "Stempelkarte & Rewards",
-    desc: "Stempel sammeln und Rewards einlösen",
+    label: "Treue-Karte & Rewards",
+    desc: "Besuche sammeln und Rewards einlösen",
     color: C.fresh,
     required: true,
   },
@@ -40,7 +40,7 @@ const PERMISSIONS = [
     id: "location",
     Icon: MapPin,
     label: "In der Nähe erinnert werden",
-    desc: "Nur ~200 m vom Spot — z. B. „Noch 3 Stempel bis Gratis-Kaffee“",
+    desc: "Nur ~200 m vom Spot — z. B. „Noch 3 Besuche bis Gratis-Kaffee“",
     color: "#1B6CA8",
     required: false,
   },
@@ -92,7 +92,7 @@ export default function CheckInConsent({ spot, onAccept, onDecline }) {
               <span style={{ fontSize: 20 }}>🎁</span>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 800, color: C.dark }}>Dein Reward: {spot?.reward_text}</div>
-                <div style={{ fontSize: 11, color: C.muted }}>bei {spot?.max_points} Stempeln</div>
+                <div style={{ fontSize: 11, color: C.muted }}>bei {spot?.max_points} Besuchen</div>
               </div>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function CheckInConsent({ spot, onAccept, onDecline }) {
             {/* Privacy note */}
             <div style={{ marginTop: 12 }}>
               <PrivacyNote variant="success">
-                Der Spot sieht dich als anonymes Loyalty-Profil (z. B. Member #A72X91) — kein Name, keine Zahlungsdaten. Stempel gelten nur bei diesem Spot.
+                Der Spot sieht dich als anonymes Loyalty-Profil (z. B. Member #A72X91) — kein Name, keine Zahlungsdaten. Besuche gelten nur bei diesem Spot.
               </PrivacyNote>
             </div>
 
@@ -164,7 +164,7 @@ export default function CheckInConsent({ spot, onAccept, onDecline }) {
                 marginTop: 14, boxShadow: "0 6px 20px rgba(10,61,39,.25)",
               }}
             >
-              ✓ Stempelkarte hinzufügen
+              ✓ Treue-Karte hinzufügen
             </button>
             <button
               onClick={onDecline}

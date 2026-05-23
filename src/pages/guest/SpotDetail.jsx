@@ -213,7 +213,7 @@ export default function SpotDetail({ spotId, onBack, onCheckin }) {
           >
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: stamp.reward_ready ? C.orange : bg, marginBottom: 5 }}>
-                {stamp.reward_ready ? "🎁 Reward bereit!" : `${stamp.points}/${stamp.max_points} Stempel`}
+                {stamp.reward_ready ? "🎁 Reward erreicht!" : `${stamp.points}/${stamp.max_points} Besuche`}
               </div>
               <div style={{ height: 4, background: `${bg}18`, borderRadius: 99, overflow: "hidden" }}>
                 <div style={{ height: 4, width: `${Math.round((stamp.points / stamp.max_points) * 100)}%`, background: stamp.reward_ready ? C.orange : bg, borderRadius: 99, transition: "width 1s ease" }} />
@@ -338,7 +338,7 @@ function OverviewTab({
       {stamp && (
         <div style={{ background: C.white, borderRadius: 18, border: `1.5px solid ${stamp.reward_ready ? `${C.orange}45` : `${bg}25`}`, padding: "16px", marginBottom: 14, boxShadow: stamp.reward_ready ? `0 8px 28px ${C.orange}15` : `0 4px 20px rgba(6,13,8,.07)` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>Meine Stempelkarte</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark }}>Meine Treue-Karte</div>
             {stamp.reward_ready && (
               <div style={{ background: C.orange, color: "#fff", borderRadius: 99, padding: "4px 12px", fontSize: 11, fontWeight: 800 }}>🎁 Einlösbar</div>
             )}
@@ -361,7 +361,7 @@ function OverviewTab({
             <div style={{ flex: 1 }}>
               {stamp.reward_ready ? (
                 <>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: C.orange, marginBottom: 3 }}>🎉 Reward bereit!</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: C.orange, marginBottom: 3 }}>🎉 Reward erreicht!</div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>{stamp.reward_text || spot.reward_text}</div>
                   <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>Beim Personal einlösen.</div>
                 </>
@@ -369,7 +369,7 @@ function OverviewTab({
                 <>
                   <div style={{ fontSize: 12, fontWeight: 700, color: C.dark, marginBottom: 3 }}>Nächster Reward:</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: bg }}>{stamp.reward_text || spot.reward_text}</div>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Stempel</div>
+                  <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>Noch <strong style={{ color: C.dark }}>{stamp.max_points - stamp.points}</strong> Besuche</div>
                 </>
               )}
             </div>
@@ -444,7 +444,7 @@ function OverviewTab({
             { icon: "✅", text: "Identität geprüft" },
             { icon: "🔒", text: "DSGVO-konform" },
             { icon: "🔄", text: "Rotating QR" },
-            { icon: "⚡", text: "Stempel live" },
+            { icon: "⚡", text: "Besuch live" },
           ].map(t => (
             <div key={t.text} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.7)", borderRadius: 99, padding: "4px 10px" }}>
               <span style={{ fontSize: 11 }}>{t.icon}</span>
