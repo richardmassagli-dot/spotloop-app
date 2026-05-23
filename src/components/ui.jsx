@@ -22,9 +22,10 @@ export function Screen({ children, bg = C.bg, pad = true, scroll = true }) {
 }
 
 // ─── Logo ─────────────────────────────────────────────────────────
-const LOGO_LOCKUP = "/brand/spotloop-mark.svg";
-const LOGO_MARK = "/brand/spotloop-mark.svg";
-const MARK_ASPECT = 1;
+const LOGO_LOCKUP = "/brand/spotloop-mark.png";
+const LOGO_MARK = "/brand/spotloop-mark.png";
+/** Original-Mark 172×215 (transparentes PNG) */
+const MARK_ASPECT = 172 / 215;
 
 /** Offizielles Spotloop-Symbol (transparentes PNG, exakt wie Brand). */
 export function SpotloopIcon({ size = 28, light = false }) {
@@ -96,7 +97,7 @@ export function LogoLockup({ height = 72, light = false, style = {} }) {
         width: "auto",
         objectFit: "contain",
         display: "block",
-        ...(light ? { mixBlendMode: "screen" } : { filter: "invert(1)" }),
+        ...(light ? {} : { filter: "brightness(0)" }),
         ...style,
       }}
     />

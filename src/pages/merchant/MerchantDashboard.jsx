@@ -156,13 +156,17 @@ export default function MerchantDashboard({ onLogout }) {
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100%",
+          flex: 1,
+          minHeight: "100dvh",
+          gap: 12,
           background: MERCHANT_PAGE_BG,
         }}
       >
-        <Spinner size={40} />
+        <Spinner size={40} color={C.blue} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.muted }}>Dashboard wird geladen…</span>
       </div>
     );
   }

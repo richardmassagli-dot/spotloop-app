@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
         initialLoadDone = true;
         setLoading(false);
       }
-    }, 8000);
+    }, 4000);
 
     return () => {
       clearTimeout(timeout);

@@ -47,12 +47,18 @@ function showFatalError(err) {
     '</div>'
 }
 
+function signalAppReady() {
+  document.getElementById('spotloop-boot')?.remove()
+  window.dispatchEvent(new Event('spotloop-app-ready'))
+}
+
 const rootEl = document.getElementById('root')
 if (!rootEl) {
   showFatalError(new Error('#root fehlt in index.html'))
 } else {
   try {
     const root = createRoot(rootEl)
+    queueMicrotask(signalAppReady)
     root.render(
       <div
         className="app-frame"
@@ -73,6 +79,7 @@ if (!rootEl) {
         </AppErrorBoundary>
       </div>,
     )
+    requestAnimationFrame(signalAppReady)
   } catch (err) {
     showFatalError(err)
   }

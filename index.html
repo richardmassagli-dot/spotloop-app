@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#0A1628" />
-    <link rel="icon" type="image/svg+xml" href="/brand/spotloop-mark.svg" />
-    <link rel="apple-touch-icon" href="/brand/spotloop-icon.svg" />
+    <link rel="icon" type="image/png" href="/brand/spotloop-favicon.png" />
+    <link rel="apple-touch-icon" href="/brand/spotloop-apple-touch.png" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <meta name="description" content="Die moderne Stammgast-Wallet für lokale Lieblingsorte — Stempel sammeln, Rewards einlösen, Spots entdecken." />
     <title>Spotloop — Stammgast-Wallet</title>
@@ -34,13 +34,15 @@
           var r = e.reason;
           showBootError((r && r.message) || String(r || "Unbekannter Fehler"));
         });
+        window.addEventListener("spotloop-app-ready", function () {
+          var boot = document.getElementById("spotloop-boot");
+          if (boot) boot.remove();
+        });
         setTimeout(function () {
-          if (document.getElementById("spotloop-boot")) {
-            showBootError(
-              "Die App startet nicht. Bitte die Seite neu laden oder im Safari-Verlauf die Website-Daten für spotloop.vercel.app löschen."
-            );
-          }
-        }, 15000);
+          if (!document.getElementById("spotloop-boot")) return;
+          var hint = document.getElementById("spotloop-boot-hint");
+          if (hint) hint.textContent = "Noch einen Moment — erste Ladung kann dauern…";
+        }, 12000);
       })();
     </script>
   </head>
@@ -65,10 +67,10 @@
         "
       >
         <div style="display:inline-flex;align-items:center;justify-content:center;gap:0">
-          <img src="/brand/spotloop-mark.svg" alt="" height="22" style="display:block;height:22px;width:auto" />
+          <img src="/brand/spotloop-mark.png" alt="" height="22" style="display:block;height:22px;width:auto;filter:brightness(0)" />
           <strong style="font-size:20px;font-weight:600;letter-spacing:-0.35px;margin:0 0 0 3px;color:#0A1628;line-height:1">spotloop</strong>
         </div>
-        <span style="font-size:14px;color:#64748B">Wird geladen…</span>
+        <span id="spotloop-boot-hint" style="font-size:14px;color:#64748B">Wird geladen…</span>
       </div>
     </div>
     <style>
