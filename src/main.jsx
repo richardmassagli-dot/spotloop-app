@@ -1,7 +1,7 @@
+import { lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
-import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { LocaleProvider } from './context/LocaleContext.jsx'
 import { useAuth } from './context/AuthContext.jsx'
@@ -11,25 +11,32 @@ import AppErrorBoundary from './components/AppErrorBoundary.jsx'
 import BootComplete from './components/BootComplete.jsx'
 import { Spinner, C } from './components/ui.jsx'
 
+const App = lazy(() => import('./App.jsx'))
+
+function BootFallback() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        minHeight: '100dvh',
+        gap: 12,
+        background: C.bg,
+      }}
+    >
+      <Spinner size={40} color={C.blue} />
+      <span style={{ fontSize: 14, fontWeight: 600, color: C.muted }}>Spotloop startet…</span>
+    </div>
+  )
+}
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100dvh",
-          gap: 12,
-          background: C.bg,
-        }}
-      >
-        <Spinner size={36} color={C.blue} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: C.muted }}>Laden…</span>
-      </div>
-    );
+    return <BootFallback />;
   }
   return user ? children : <Navigate to="/" replace />;
 }
@@ -64,11 +71,13 @@ if (!rootEl) {
           <LocaleProvider>
             <AuthProvider>
               <BrowserRouter>
-                <Routes>
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/admin/spots" element={<ProtectedRoute><AdminSpots /></ProtectedRoute>} />
-                  <Route path="/*" element={<App />} />
-                </Routes>
+                <Suspense fallback={<BootFallback />}>
+                  <Routes>
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/admin/spots" element={<ProtectedRoute><AdminSpots /></ProtectedRoute>} />
+                    <Route path="/*" element={<App />} />
+                  </Routes>
+                </Suspense>
               </BrowserRouter>
             </AuthProvider>
           </LocaleProvider>

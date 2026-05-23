@@ -13,13 +13,14 @@ export default class AppErrorBoundary extends Component {
       return (
         <div
           style={{
-            height: "100%",
+            minHeight: "100dvh",
             padding: 24,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             background: C.bg,
             fontFamily: "'Inter', sans-serif",
+            boxSizing: "border-box",
           }}
         >
           <div style={{ fontSize: 18, fontWeight: 900, color: C.dark, marginBottom: 8 }}>App konnte nicht starten</div>

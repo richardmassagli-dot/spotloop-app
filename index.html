@@ -43,6 +43,12 @@
           var hint = document.getElementById("spotloop-boot-hint");
           if (hint) hint.textContent = "Noch einen Moment — erste Ladung kann dauern…";
         }, 12000);
+        setTimeout(function () {
+          if (window.__spotloopAppReady || !document.getElementById("spotloop-boot")) return;
+          showBootError(
+            "Die App konnte nicht starten. Bitte Internet prüfen, Cache leeren (Safari: Website-Daten löschen) und neu laden."
+          );
+        }, 25000);
       })();
     </script>
   </head>

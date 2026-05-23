@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { storeOnAuthStateChanged, storeSignOut } from "../lib/store";
+import { hasLikelyStoredSession } from "../lib/authBoot";
 
 const defaultAuth = {
   user: null,
   profile: null,
   session: null,
-  loading: true,
+  loading: false,
   logout: async () => {},
 };
 
@@ -15,11 +16,17 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(hasLikelyStoredSession);
   const profileKeyRef = useRef("");
 
   useEffect(() => {
     let initialLoadDone = false;
+
+    const finishInitialLoad = () => {
+      if (initialLoadDone) return;
+      initialLoadDone = true;
+      setLoading(false);
+    };
 
     const applyAuth = (u, p, s) => {
       setUser(u);
@@ -34,20 +41,11 @@ export function AuthProvider({ children }) {
         }
       }
       setSession(s ?? null);
-      if (!initialLoadDone) {
-        initialLoadDone = true;
-        setLoading(false);
-      }
+      finishInitialLoad();
     };
 
     const unsub = storeOnAuthStateChanged(applyAuth);
-
-    const timeout = setTimeout(() => {
-      if (!initialLoadDone) {
-        initialLoadDone = true;
-        setLoading(false);
-      }
-    }, 2500);
+    const timeout = setTimeout(finishInitialLoad, 1500);
 
     return () => {
       clearTimeout(timeout);

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 export default function BootComplete() {
   useEffect(() => {
     const done = () => {
+      window.__spotloopAppReady = true;
       document.getElementById("spotloop-boot")?.remove();
       window.dispatchEvent(new Event("spotloop-app-ready"));
     };
