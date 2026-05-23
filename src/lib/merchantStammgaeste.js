@@ -96,20 +96,13 @@ function buildPatternHint(weekdays, respondsToCampaigns) {
   return parts.join(" · ");
 }
 
-function prestigeHints(userId, spotId) {
-  const seed = `${userId}:${spotId}`.length % 3;
-  const table = ["Fensterplatz", "Theke", "ruhiger Bereich"][seed];
-  const dish = ["Lieblingsgericht notiert", "Stammgericht erkannt", "Präferenz im Profil"][seed];
-  return { tablePreference: table, dishNote: dish };
-}
-
 /**
  * Stammgäste-Dashboard: Top 10 %, anonyme Profile, Schläfer-Risiko, Muster.
  */
 export function buildStammgaesteDashboard(
   stampMembers = [],
   spotId,
-  { checkins = [], campaigns = [], followerCount = 0, prestigeDetail = false } = {},
+  { checkins = [], campaigns = [], followerCount = 0 } = {},
 ) {
   const top = buildTopRegularGuests(stampMembers, spotId, {
     percent: TOP_STAMMGAST_PERCENT,
@@ -137,7 +130,6 @@ export function buildStammgaesteDashboard(
       patternHint,
       inactive: daysSinceVisit >= STAMMGAST_INACTIVE_DAYS,
       regular: !sleepRisk && visitsMonth >= 2,
-      prestigeDetail: prestigeDetail ? prestigeHints(g.userId, spotId) : null,
     };
   });
 

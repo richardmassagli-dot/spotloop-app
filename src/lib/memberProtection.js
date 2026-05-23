@@ -4,6 +4,7 @@ import {
   REACTIVATION_COOLDOWN_DAYS,
   REACTIVATION_CAMPAIGN_MESSAGE,
   WEEKLY_CAMPAIGN_LIMIT_BY_PLAN,
+  normalizeMerchantPlanId,
 } from "../data/spotloopProductRules.js";
 import { daysSince } from "./campaignAudiences.js";
 import { getPrivacyPrefs } from "./privacy.js";
@@ -16,7 +17,8 @@ export {
 };
 
 export function getWeeklyCampaignLimit(planId = "growth") {
-  return WEEKLY_CAMPAIGN_LIMIT_BY_PLAN[planId] ?? WEEKLY_CAMPAIGN_LIMIT_BY_PLAN.growth;
+  const id = normalizeMerchantPlanId(planId);
+  return WEEKLY_CAMPAIGN_LIMIT_BY_PLAN[id] ?? WEEKLY_CAMPAIGN_LIMIT_BY_PLAN.growth;
 }
 
 function isNormalCampaignType(type) {

@@ -10,7 +10,6 @@ export default function StammGuestProfileCard({
   guest,
   compact = false,
   isLast = false,
-  showPrestigeDetail = false,
   onSuggestReactivation,
   onSuggestInvite,
   busy = false,
@@ -94,12 +93,6 @@ export default function StammGuestProfileCard({
           {guest.patternHint.includes("Kampagnen") && !compact && (
             <span style={{ color: C.muted, fontWeight: 500 }}> — z. B. Happy Hour gezielt legen</span>
           )}
-        </div>
-      )}
-
-      {showPrestigeDetail && guest.prestigeDetail && (
-        <div style={{ marginTop: 8, fontSize: 10, color: C.muted, lineHeight: 1.5 }}>
-          Tisch: {guest.prestigeDetail.tablePreference} · {guest.prestigeDetail.dishNote} (anonym)
         </div>
       )}
 

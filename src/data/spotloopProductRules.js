@@ -17,9 +17,13 @@ export const WEEKLY_CAMPAIGN_LIMIT_BY_PLAN = {
   starter: 0,
   growth: 2,
   pro: 8,
-  prestige: 99,
-  enterprise: 99,
 };
+
+/** Legacy-Plan-IDs → aktuelles Modell (nur Pilot / Starter / Growth / Pro). */
+export function normalizeMerchantPlanId(planId) {
+  if (!planId || planId === "prestige" || planId === "enterprise") return "pro";
+  return planId;
+}
 
 export const FOLLOW_VS_COLLECT = {
   title: "Folgen vs. Sammeln",

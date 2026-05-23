@@ -323,12 +323,7 @@ export default function SpotloopPricing({ spotName, compact = false }) {
         }}
       >
         <Mail size={18} />
-        {selectedPlan.contactSales
-          ? selectedPlan.id === "enterprise"
-            ? "Enterprise anfragen"
-            : "Prestige anfragen"
-          : "Plan anfragen"}{" "}
-        — {selectedPlan.name}
+        Plan anfragen — {selectedPlan.name}
       </a>
 
       <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 12, lineHeight: 1.45 }}>

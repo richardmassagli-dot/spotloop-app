@@ -39,7 +39,6 @@ export default function MerchantCommunity({ spotId, spot, checkins = [], campaig
       buildStammgaesteDashboard(stampMembers, spotId, {
         checkins,
         campaigns,
-        prestigeDetail: merchantPlanId === "prestige" || merchantPlanId === "enterprise" || merchantPlanId === "pilot",
       }),
     [stampMembers, spotId, checkins, campaigns, merchantPlanId],
   );

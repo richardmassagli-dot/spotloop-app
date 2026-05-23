@@ -59,28 +59,4 @@ export const SPOTLOOP_MARKET_TIERS = [
     target: "Ambitionierte Spots & kleine Ketten",
     features: ["8 Kampagnen/Woche", "VIP-Aktionen", "Jahresauswertung", "Spot-Netzwerk"],
   },
-  {
-    id: "prestige",
-    name: "Prestige",
-    priceRange: "€399–799/mo",
-    target: "Fine Dining & Premium",
-    features: [
-      "Membership statt Stempel",
-      "Persönliche Einladungen",
-      "Diskrete Gästeprofile",
-      "Unbegrenzte Kampagnen",
-    ],
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    priceRange: "ab €999/mo",
-    target: "Ketten & Franchises",
-    features: [
-      "Zentrales Dashboard",
-      "Standort-Vergleich",
-      "API-Kassensystem",
-      "White-Label",
-    ],
-  },
 ];

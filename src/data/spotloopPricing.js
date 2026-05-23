@@ -91,42 +91,6 @@ export const SPOTLOOP_PRICING_PLANS = [
     includesNetwork: true,
     contactSales: false,
   },
-  {
-    id: "prestige",
-    name: "Prestige",
-    price: "€399–799",
-    period: "/ Monat",
-    tagline: "Gehobene Gastronomie — Membership statt Stempel",
-    features: "Membership-Stufen · persönliche Einladungen · unbegrenzte Kampagnen",
-    tier: "prestige",
-    campaignsPerWeek: "Unbegrenzt",
-    campaignsPerMonth: "Unbegrenzt",
-    vipActionsPerMonth: "Unbegrenzt",
-    includesCampaigns: true,
-    includesStammgaeste: true,
-    includesOverview: true,
-    includesNetwork: false,
-    noStamps: true,
-    contactSales: true,
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    price: "ab €999",
-    period: "/ Monat",
-    tagline: "Ketten & Franchises — zentral steuern",
-    features: "Zentrales Dashboard · Standort-Vergleich · API · White-Label",
-    tier: "enterprise",
-    campaignsPerWeek: "Unbegrenzt",
-    campaignsPerMonth: "Unbegrenzt",
-    vipActionsPerMonth: "Unbegrenzt",
-    includesCampaigns: true,
-    includesStammgaeste: true,
-    includesOverview: true,
-    includesNetwork: true,
-    multiLocation: true,
-    contactSales: true,
-  },
 ];
 
 /** Monatspreise (netto) für Upgrade-Vergleich. */
@@ -134,8 +98,6 @@ export const PLAN_MONTHLY_EUR = {
   starter: 49,
   growth: 149,
   pro: 249,
-  prestige: 399,
-  enterprise: 999,
 };
 
 /**
@@ -236,7 +198,7 @@ export function recordExtraCreditsPurchase(spotId, priceEur) {
  */
 export function getExtraCreditsUpgradeNudge(planId, extraSpentEur = 0) {
   if (!extraSpentEur || extraSpentEur < 59) return null;
-  if (planId === "pro" || planId === "prestige" || planId === "enterprise" || planId === "pilot") {
+  if (planId === "pro" || planId === "pilot") {
     return null;
   }
 
@@ -318,19 +280,6 @@ export const PLAN_FEATURE_BULLETS = {
     "VIP-Aktionen nur an Top-Stammgäste",
     "Jahresauswertung Wiederkehr",
     "Spot-Netzwerk für mehrere Standorte",
-  ],
-  prestige: [
-    "Für Fine Dining & Premium-Gastronomie",
-    "Membership-Stufen statt Stempel — keine Rabatt-Kultur",
-    "Persönliche Einladungen & diskrete Gästeprofile",
-    "Unbegrenzte Kampagnen inklusive",
-  ],
-  enterprise: [
-    "Für Ketten & Franchises (30+ Standorte)",
-    "Zentrales Dashboard & Standort-Vergleich",
-    "Eine Kampagne erreicht alle Member aller Standorte",
-    "API-Integration ins Kassensystem",
-    "White-Label-Option",
   ],
 };
 

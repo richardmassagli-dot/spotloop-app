@@ -18,10 +18,8 @@ import {
   STAMMGAST_PHILOSOPHY,
   STAMMGAST_PLAN_GROWTH,
   STAMMGAST_PLAN_VIP,
-  STAMMGAST_PLAN_PRESTIGE,
   canAccessStammgaeste,
   canAccessVipStammgastActions,
-  hasPrestigeStammgastDetail,
 } from "../../data/stammgaesteMessaging";
 
 export default function MerchantStammgaesteSimple({
@@ -43,7 +41,6 @@ export default function MerchantStammgaesteSimple({
 
   const stammAccess = canAccessStammgaeste(merchantPlanId);
   const vipAccess = canAccessVipStammgastActions(merchantPlanId);
-  const prestigeDetail = hasPrestigeStammgastDetail(merchantPlanId);
 
   useEffect(() => {
     if (!spotId) return;
@@ -59,9 +56,8 @@ export default function MerchantStammgaesteSimple({
         checkins,
         campaigns,
         followerCount,
-        prestigeDetail,
       }),
-    [members, spotId, checkins, campaigns, followerCount, prestigeDetail],
+    [members, spotId, checkins, campaigns, followerCount],
   );
 
   const reactivationGate = canSendReactivation({ campaigns: spotCampaigns });
@@ -169,7 +165,6 @@ export default function MerchantStammgaesteSimple({
           <StammGuestProfileCard
             key={g.userId}
             guest={g}
-            showPrestigeDetail={prestigeDetail}
             onSuggestReactivation={sendReactivation}
             onSuggestInvite={sendReactivation}
             busy={sending}
@@ -179,9 +174,6 @@ export default function MerchantStammgaesteSimple({
 
       {!vipAccess && (
         <p style={{ fontSize: 11, color: C.muted, marginTop: 14, lineHeight: 1.45 }}>{STAMMGAST_PLAN_VIP}</p>
-      )}
-      {!prestigeDetail && (
-        <p style={{ fontSize: 11, color: C.muted, marginTop: 8, lineHeight: 1.45 }}>{STAMMGAST_PLAN_PRESTIGE}</p>
       )}
 
       <p style={{ fontSize: 11, color: C.muted, marginTop: 16, lineHeight: 1.55, fontStyle: "italic" }}>
